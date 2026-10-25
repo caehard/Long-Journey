@@ -1,0 +1,12 @@
+{
+  "tipo": "personagem",
+  "ficha": true,
+  "nome": "Lobo da Estepe",
+  "classes": [
+    "besta"
+  ],
+  "raca": "Fera",
+  "funcao": "Caçador",
+  "poder": 2,
+  "texto": "Ataque de oportunidade. Espinhos 1.\nAliado comum. Herda o alinhamento do dono."
+}

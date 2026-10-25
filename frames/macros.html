@@ -1,0 +1,22 @@
+{# Peças reutilizadas pelos frames. Um símbolo (s) tem nome, sigla, icone e valor. #}
+
+{% macro conteudo(s) -%}
+  {%- if s.icone %}<img src="{{ s.icone }}" alt="{{ s.nome }}">{% else %}<span>{{ s.sigla }}</span>{% endif -%}
+  {%- if s.valor %}<span>{{ s.valor }}</span>{% endif -%}
+{%- endmacro %}
+
+{# classe sem ícone: hexágono com a sigla (com ícone, vem pronta em c.classes_svg) #}
+{% macro hex(s) -%}
+  <div class="hex" title="{{ s.nome }}"><span>{{ s.sigla }}</span></div>
+{%- endmacro %}
+
+{# todas as classes da carta: estandarte partido se for dupla classe #}
+{% macro classes(c) -%}
+  {%- if c.classe_dupla %}{{ c.classe_dupla }}{% else %}{% for s, svg in c.classes_svg %}{{ svg or hex(s) }}{% endfor %}{% endif -%}
+{%- endmacro %}
+
+{# símbolo redondo na ponta direita da barra de tipo (subtipo, palavra-chave) #}
+{% macro simbolo(s) -%}
+  <div class="sub-simbolo{% if s.valor %} com-valor{% endif %}" title="{{ s.nome }}{% if s.valor %} {{ s.valor }}{% endif %}">{{ conteudo(s) }}</div>
+{%- endmacro %}
+

@@ -1,0 +1,11 @@
+{
+  "tipo": "runa",
+  "nome": "Runa do Eco Arcano",
+  "numero": "",
+  "estrelas": 4,
+  "elemento": "mana",
+  "avancado": true,
+  "texto": "Entra por cima de uma ficha de runa sua.\nQuando você exaurir esta runa para pagar uma ação de **Mana**, ela conta como tendo **+1 carga**.",
+  "ambientacao": "Cada feitiço lançado aqui ainda ressoa no seguinte.",
+  "arte": ""
+}

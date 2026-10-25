@@ -1,0 +1,3 @@
+Templates do frame antigo (barra do nome no topo, faixa de tipo, trapézio na base), guardados
+quando todos os tipos passaram para o layout do personagem (frames/carta.html). Não são usados
+pelo gerador; para voltar a eles, mova de volta para frames/ e troque o template em dados.ler_dados.

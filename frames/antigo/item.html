@@ -1,0 +1,17 @@
+{#
+  Item lendário (ou item comum, se for ficha). Sem ato nem classe (livro, seção 6 e glossário).
+  Círculo: custo em moedas no padrão dos elementos (simbolos.moeda_custo), quando o item pode ser
+  comprado com Abra o mercado; sem custo, sem círculo.
+  Sem barra de tipo: um medalhão no centro com o ícone do slot diz tudo (lendário com contorno
+  duplo e losangos; comum com anel simples). Ele fica no topo de um "telhado": duas retas descem
+  dele até as laterais; a arte fica acima, e abaixo um painel escuro com o texto centralizado.
+#}
+{% extends "base.html" %}
+
+{% block faixa %}
+<svg class="arco-item" viewBox="0 0 630 880" preserveAspectRatio="none" aria-hidden="true">
+  <path class="arco-painel" d="M0 578 L315 452 L630 578 L630 880 L0 880 Z"/>
+  <path class="arco-linha" d="M0 578 L315 452 L630 578"/>
+</svg>
+<div class="medalhao-slot">{{ c.medalhao }}</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- retiro: tenda de acampamento com a entrada aberta -->
+  <path d="M50 22 L86 80 H14 Z M50 46 L38 80 H62 Z" fill="#efe6d2" fill-rule="evenodd"/>
+  <path d="M50 22 L42 10 M50 22 L58 10" fill="none" stroke="#efe6d2" stroke-width="5" stroke-linecap="round"/>
+  <path d="M8 88 H92" fill="none" stroke="#efe6d2" stroke-width="6" stroke-linecap="round"/>
+</svg>

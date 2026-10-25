@@ -1,0 +1,18 @@
+{#
+  Runa. Básica (ficha): só a barra do nome, o círculo do elemento e a arte inteira.
+  Avançada: o círculo ganha a moldura rúnica (simbolos.circulo_runa_avancada), que diz
+  "avançada" no lugar do pentágono "Av", e o efeito vai numa caixa com rótulo na metade de baixo.
+#}
+{% extends "base.html" %}
+
+{% block faixa %}{% endblock %}
+
+{% block zona_texto %}
+{% if c.avancado %}
+<div class="runa-caixa">
+  <div class="runa-rotulo"><span>Runa avançada</span></div>
+  <div class="efeito ajustar-altura">{{ c.texto|marcacao }}</div>
+  {% if c.ambientacao %}<div class="ambientacao">{{ c.ambientacao|marcacao_linha }}</div>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

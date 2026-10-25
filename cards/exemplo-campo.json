@@ -1,0 +1,10 @@
+{
+  "tipo": "campo",
+  "nome": "Planície das Cinzas",
+  "numero": "030",
+  "estrelas": 3,
+  "elemento": "caos",
+  "avancado": false,
+  "texto": "Toda unidade que atacar sofre 1 de dano depois que a pilha esvaziar.",
+  "ambientacao": "Nada cresce onde o fogo dormiu."
+}

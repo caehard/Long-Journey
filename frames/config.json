@@ -1,0 +1,58 @@
+{
+  "colecao": {
+    "total": "000",
+    "edicao": "Protótipo"
+  },
+
+  "_elementos": "A cor precisa bater com a do símbolo em frames/icones/elementos/<chave>.svg (ela pinta o anel das ações).",
+  "elementos": {
+    "mecha":  { "nome": "Mecha",  "cor": "#d58a3c", "sigla": "Mec" },
+    "mana":   { "nome": "Mana",   "cor": "#4f86e8", "sigla": "Man" },
+    "divino": { "nome": "Divino", "cor": "#ecd58c", "sigla": "Div" },
+    "gaia":   { "nome": "Gaia",   "cor": "#5fae55", "sigla": "Gai" },
+    "alma":   { "nome": "Alma",   "cor": "#a97de3", "sigla": "Alm" },
+    "caos":   { "nome": "Caos",   "cor": "#d8434f", "sigla": "Cao" }
+  },
+
+  "_classes": "Estandartes em frames/icones/classes/<chave>.svg. Classe sem ícone aparece como hexágono com a sigla.",
+  "classes": {
+    "mago":      { "nome": "Mago",      "sigla": "Mag" },
+    "guerreiro": { "nome": "Guerreiro", "sigla": "Gue" },
+    "besta":     { "nome": "Besta",     "sigla": "Bes" },
+    "mercador":  { "nome": "Mercador",  "sigla": "Mer" },
+    "ladino":    { "nome": "Ladino",    "sigla": "Lad" },
+    "guardiao":  { "nome": "Guardião",  "sigla": "Gua" }
+  },
+
+  "_palavras_chave": "Escritas no texto da carta (ex.: Escudo 2). As que têm glifo em frames/icones/palavras-chave/<chave>.svg viram selo no personagem; apague o arquivo para tirar o ícone.",
+  "palavras_chave": {
+    "interceptar":             { "nome": "Interceptar", "sigla": "Int" },
+    "escudo":                  { "nome": "Escudo", "sigla": "Esc" },
+    "perfurante":              { "nome": "Perfurante", "sigla": "Per" },
+    "elusivo":                 { "nome": "Elusivo", "sigla": "Elu" },
+    "perceptivo":              { "nome": "Perceptivo", "sigla": "Pcp" },
+    "distante":                { "nome": "Distante", "sigla": "Dis" },
+    "espinhos":                { "nome": "Espinhos", "sigla": "Esp" },
+    "regenerar":               { "nome": "Regenerar", "sigla": "Reg" },
+    "invasor":                 { "nome": "Invasor", "sigla": "Inv" },
+    "ataque-de-oportunidade":  { "nome": "Ataque de oportunidade", "sigla": "AdO" }
+  },
+
+  "_subtipos_acao": "Fixos pelo livro (seção 3). Ícone: frames/icones/subtipos/<chave>.svg",
+  "subtipos_acao": {
+    "reacao": { "nome": "Reação", "sigla": "Rea" },
+    "ataque": { "nome": "Ataque", "sigla": "Ata" },
+    "leve":   { "nome": "Leve",   "sigla": "Lev" }
+  },
+
+  "_slots": "Subtipos de item lendário (seção 3). Ícone: frames/icones/slots/<chave>.svg",
+  "slots": {
+    "arma-de-1-mao": { "nome": "Arma de 1 mão",  "sigla": "1M" },
+    "arma-de-2-maos": { "nome": "Arma de 2 mãos", "sigla": "2M" },
+    "acessorio":     { "nome": "Acessório", "sigla": "Ac" },
+    "bota":          { "nome": "Bota",      "sigla": "Bo" },
+    "peitoral":      { "nome": "Peitoral",  "sigla": "Pe" },
+    "elmo":          { "nome": "Elmo",      "sigla": "El" },
+    "luvas":         { "nome": "Luvas",     "sigla": "Lu" }
+  }
+}

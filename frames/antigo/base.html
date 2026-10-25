@@ -1,0 +1,89 @@
+{#
+  Frame comum de todas as cartas (nasceu da carta de ação):
+  - topo: barra do nome, com o pentágono (ponta para a direita) por cima da ponta esquerda
+    e o círculo (elementos/custo, slot, níveis...) por cima da ponta direita;
+  - atributos opcionais sobre a arte (o cristal de poder do personagem);
+  - meio: estandarte da classe pendurado na ponta esquerda da barra de tipo, texto do tipo
+    no centro e símbolos (subtipos, coroa do personagem único) na ponta direita;
+  - texto direto sobre a arte, que continua atrás com um véu meio opaco;
+  - linha fina na borda e base em trapézio, na cor do tema, com número, estrela e edição.
+  Cores: --prata é a 1ª cor do tema; --tema-grad divide as cores dos elementos (simbolos.tema).
+  Estilos em frame.css. Cada tipo estende este arquivo e preenche os blocos:
+  pentagono (texto curto; vazio = sem pentágono), circulo (vazio = sem círculo),
+  selos, faixa (a barra do meio inteira; o item troca por um medalhão), tipo, simbolos,
+  zona_texto (texto e ambientação; a quest troca por 3 caixas), rodape_texto,
+  caixa_base (caixa perto da base; o texto sobe para dar lugar).
+  Variáveis: c (dados da carta já normalizados), id (nome do arquivo de saída), sangria.
+#}
+{% import "macros.html" as m %}
+{% set pent = self.pentagono()|trim %}
+{% set circ = self.circulo()|trim %}
+{% set caixa = self.caixa_base()|trim %}
+<div data-id="{{ id }}" class="carta frame tipo-{{ c.tipo }}{% if caixa %} com-caixa{% endif %}{% if not sangria %} sem-sangria{% endif %}"
+     style="--sangria: {{ sangria }}px; --tinta: {{ c.tinta }}; --prata: {{ c.tema.a }}; --tema-grad: {{ c.tema.grad }}; --texto-esq: {{ c.tema.texto_esq }}; --texto-dir: {{ c.tema.texto_dir }};{% if c.arte_posicao %} --arte-pos: {{ c.arte_posicao }};{% endif %}{% if c.arte_zoom %} --arte-zoom: {{ c.arte_zoom }};{% endif %}">
+  <div class="arte">
+    {% if c.arte_url %}<img src="{{ c.arte_url }}" alt="">{% else %}<div class="arte-vazia">ARTE</div>{% endif %}
+  </div>
+  <div class="corte">
+    <div class="vinheta"></div>
+    <div class="veu"></div>
+
+    <header class="cabecalho{% if not pent %} sem-pent{% endif %}{% if not circ %} sem-circulo{% endif %}">
+      <div class="barra-nome"><div class="nome ajustar-largura">{{ c.nome }}</div></div>
+      {% if pent %}
+      <svg class="ato-pent" viewBox="0 0 70 60" role="img" aria-label="{{ pent }}">
+        <polygon points="3,3 44,3 67,30 44,57 3,57"/>
+        <text x="30" y="31">{{ pent }}</text>
+      </svg>
+      {% endif %}
+      {% if circ %}<div class="circulo-topo">{{ circ }}</div>{% endif %}
+    </header>
+
+    {% block selos %}{% endblock %}
+
+    {% block faixa %}
+    <div class="linha-tipo">
+      {% if c.classes_s %}<div class="bandeiras">{{ m.classes(c) }}</div>{% endif %}
+      <div class="barra-tipo{% if c.classes_s %} com-classe{% endif %}">
+        <div class="tipo-texto ajustar-largura">{% block tipo %}{% endblock %}</div>
+        <div class="sub-simbolos">
+          {% block simbolos %}{% endblock %}
+        </div>
+      </div>
+    </div>
+    {% endblock %}
+
+    {% block zona_texto %}
+    <div class="texto-carta">
+      <div class="efeito ajustar-altura">{{ c.texto|marcacao }}</div>
+      {% block rodape_texto %}
+        {% if c.ambientacao %}<div class="ambientacao">{{ c.ambientacao|marcacao_linha }}</div>{% endif %}
+      {% endblock %}
+    </div>
+    {% endblock %}
+
+    {{ caixa }}
+
+    <div class="borda-tema"></div>
+    <div class="base-cantos"></div>
+    <footer class="base-trapezio">
+      <span class="base-num">{{ c.rotulo_numero }}</span>
+      {% if c.sem_estrela %}
+      <span class="base-vazio"></span>
+      {% elif c.ficha %}
+      <span class="ficha-marca">Ficha</span>
+      {% else %}
+      <svg class="estrela-custo" viewBox="0 0 100 96" role="img" aria-label="{{ c.estrelas }} estrelas">
+        <defs><linearGradient id="contorno-{{ id }}" x1="0" y1="0" x2="1" y2="0">
+          {% for cor, ini, fim in c.tema.estrela %}<stop offset="{{ ini }}%" stop-color="{{ cor }}"/><stop offset="{{ fim }}%" stop-color="{{ cor }}"/>{% endfor %}
+        </linearGradient></defs>
+        <path stroke="url(#contorno-{{ id }})" d="M50 4 L62.5 34.5 L95 37 L70 58.5 L78 91 L50 73.5 L22 91 L30 58.5 L5 37 L37.5 34.5 Z"/>
+        <text x="50" y="56">{{ c.estrelas }}</text>
+      </svg>
+      {% endif %}
+      <span class="base-edicao">{{ c.rotulo_edicao }}</span>
+    </footer>
+  </div>
+</div>
+{# só declara os blocos de valor; eles são lidos acima por self.<bloco>() #}
+{% if false %}{% block pentagono %}{% endblock %}{% block circulo %}{{ c.circulo }}{% endblock %}{% block caixa_base %}{% endblock %}{% endif %}

@@ -1,0 +1,12 @@
+{
+  "tipo": "quest",
+  "nome": "O Despertar do Dragão",
+  "numero": "040",
+  "estrelas": 2,
+  "atos": [
+    "Invoque um **Filhote de Dragão** (neutro, poder 3) no campo de batalha. Quem der o golpe final completa a quest.",
+    "Invoque um **Dragão Jovem** (neutro, poder 6, Escudo 1) no campo de batalha. Quem der o golpe final completa a quest.",
+    "Invoque o **Dragão Ancião** (neutro, poder 8, Escudo 2, Espinhos 1) no campo de batalha. Quem der o golpe final completa a quest."
+  ],
+  "recompensa": "Quem completar esta quest puxa um **item lendário** do seu deck de Eventos."
+}

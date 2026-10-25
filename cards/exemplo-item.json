@@ -1,0 +1,11 @@
+{
+  "tipo": "item",
+  "nome": "Lâmina do Crepúsculo",
+  "numero": "020",
+  "estrelas": 6,
+  "ato_minimo": 2,
+  "custo_moedas": 4,
+  "slot": "arma de 1 mão",
+  "texto": "O portador tem +1 de poder.\nQuando o portador atacar, ele ganha Perfurante 2 até o fim do turno.",
+  "ambientacao": "Forjada entre o último raio de sol e a primeira sombra."
+}

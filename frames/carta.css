@@ -1,0 +1,99 @@
+/*
+  Base comum de todas as cartas: fontes, cores, tamanho, arte e peças soltas.
+  O layout do frame fica em frame.css.
+  Escala: 10 px = 1 mm. A área de corte tem 630 x 880 px (63 x 88 mm).
+  Com sangria, a carta cresce --sangria em cada lado; só a arte, a borda e a
+  base ocupam essa margem, o resto fica dentro de .corte.
+*/
+
+@font-face { font-family: "Cinzel"; src: url("fontes/Cinzel.ttf"); font-weight: 400 900; }
+@font-face { font-family: "Source Sans 3"; src: url("fontes/SourceSans3.ttf"); font-weight: 200 900; }
+@font-face { font-family: "Source Sans 3"; src: url("fontes/SourceSans3-Italic.ttf"); font-weight: 200 900; font-style: italic; }
+
+:root {
+  --prata: #c3c9d4;          /* sobrescrita por carta com a 1ª cor do tema */
+  --prata-clara: #eef0f4;
+  --creme: #efe6d2;
+  --painel: rgba(13, 15, 21, 0.86);
+  --painel-solido: #11131a;
+  --fundo: #1f2433;
+  --cinza: #9aa0b4;
+  --cinza-escuro: #5d647a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.carta {
+  --sangria: 0px;
+  --tinta: #3a4258;
+  position: relative;
+  width: calc(630px + 2 * var(--sangria));
+  height: calc(880px + 2 * var(--sangria));
+  overflow: hidden;
+  background: var(--fundo);
+  color: var(--creme);
+  font-family: "Source Sans 3", sans-serif;
+}
+.carta.sem-sangria { border-radius: 30px; }
+
+/* ---------- arte ---------- */
+
+.arte { position: absolute; inset: 0; overflow: hidden; }
+.arte img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: var(--arte-pos, 50% 40%);
+  transform: scale(var(--arte-zoom, 1));
+  transform-origin: var(--arte-pos, 50% 40%);
+}
+.arte-vazia {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background:
+    radial-gradient(ellipse at 50% 42%, color-mix(in srgb, var(--tinta) 45%, transparent) 0%, transparent 62%),
+    linear-gradient(160deg, #262c3d 0%, #1b1f2c 100%);
+  color: rgba(239, 230, 210, 0.28);
+  font-size: 22px; letter-spacing: 6px;
+}
+
+.corte { position: absolute; left: var(--sangria); top: var(--sangria); width: 630px; height: 880px; }
+
+/* ---------- textos ---------- */
+
+.nome {
+  font-family: "Cinzel", serif; font-weight: 700;
+  font-size: 34px; line-height: 1.05;
+  white-space: nowrap; overflow: hidden;
+  color: var(--creme);
+}
+.efeito {
+  flex: 1; min-height: 0; overflow: hidden;
+  font-size: 21px; line-height: 1.28; font-weight: 500;
+}
+.efeito p + p { margin-top: 6px; }
+.efeito strong { font-weight: 800; color: #fff6e4; }
+
+/* ---------- peças ---------- */
+
+/* classe sem ícone */
+.hex {
+  width: 40px; height: 35px; flex: none;
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  background: var(--prata); color: #15181f;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px;
+}
+.estandarte { flex: none; display: block; }
+.elementos { display: block; }
+
+
+.ficha-marca {
+  flex: none; height: 30px; padding: 0 14px;
+  display: flex; align-items: center;
+  background: var(--painel-solido);
+  border: 1.5px dashed var(--cinza); border-radius: 15px;
+  font-family: "Cinzel", serif; font-weight: 700; font-size: 14px; letter-spacing: 2px;
+  color: var(--creme);
+}
+
+.erro-ajuste { outline: 3px dashed #ff3b3b; outline-offset: -3px; }

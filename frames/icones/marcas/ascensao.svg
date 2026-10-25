@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- ascensão: estrela radiante, o topo da jornada -->
+  <path d="M50 6 L59 41 L94 50 L59 59 L50 94 L41 59 L6 50 L41 41 Z" fill="#efe6d2"/>
+  <g stroke="#efe6d2" stroke-width="6" stroke-linecap="round">
+    <path d="M22 22 L32 32"/><path d="M78 22 L68 32"/><path d="M22 78 L32 68"/><path d="M78 78 L68 68"/>
+  </g>
+</svg>

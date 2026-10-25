@@ -1,0 +1,14 @@
+{
+  "tipo": "acao",
+  "nome": "Golpe Flamejante",
+  "numero": "001",
+  "estrelas": 3,
+  "ato_minimo": 2,
+  "elementos": ["mecha", "caos"],
+  "custo_carga": 2,
+  "classes": ["guerreiro"],
+  "subtipos": ["ataque", "leve"],
+  "texto": "Cause **3** de dano físico a um personagem na mesma zona do executor.\nA partir do ato III, cause 2 de dano adicional.",
+  "ambientacao": "\"O vento carrega a brasa até onde a lâmina não alcança.\"",
+  "arte": "arte/golpe-flamejante.png"
+}

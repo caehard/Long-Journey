@@ -1,0 +1,197 @@
+/*
+  Frame comum de todas as cartas (frames/carta.html), nascido do personagem: sem trapézio e sem faixa de tipo.
+  Mesma escala de carta.css: 10 px = 1 mm, área de corte 630 x 880 px.
+  Usa de frame.css só o véu, a vinheta, a estrela, as cores das gemas e dos selos.
+*/
+
+/* véu mais baixo: a metade de cima é só arte, o escuro começa perto do nome */
+.pj .veu { top: 400px; }
+
+/* ---------- linha grossa um pouco para dentro da borda ---------- */
+/* SVG com trechos: a linha é interrompida sob o estandarte, o nome e a caixa (dados._cortes_moldura) */
+
+.pj-moldura {
+  position: absolute; left: 0; top: 0; width: 630px; height: 880px; pointer-events: none;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.6));
+}
+/* polígonos cheios: chanfro nas quinas, fina nas laterais e grossa perto das quinas */
+.pj-moldura path { stroke: none; }  /* preenchimento: gradiente com as cores do tema, no template */
+
+/* ---------- raça na vertical, no canto de cima à esquerda ---------- */
+/* vertical-rl: a 1ª linha (raça) fica à direita; a de clã/função, junto da borda.
+   Sem clã nem função, a raça sozinha fica junto da borda. */
+
+.pj-raca {
+  position: absolute; left: 36px; top: 40px; height: 430px;
+  writing-mode: vertical-rl; overflow: hidden;
+  font-family: "Cinzel", serif; font-weight: 700; font-size: 24px; line-height: 1.12;
+  letter-spacing: 2px; text-transform: uppercase; white-space: nowrap;
+  color: var(--creme); text-shadow: 0 0 6px rgba(0, 0, 0, 0.9), 0 1px 2px #000;
+}
+
+/* ---------- estandarte: elemento, coroa de único e classe ---------- */
+
+.pj-pano { position: absolute; right: 36px; top: 0; z-index: 2; }
+.pj-bandeira { display: block; overflow: visible; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6)); }
+.pj-bandeira .pano { fill: rgba(13, 15, 21, 0.9); stroke-width: 3; stroke-linejoin: round; }
+.pj-bandeira .pano-anel { fill: var(--painel-solido); stroke-width: 4; }
+.pj-bandeira .pano-anel-fino { fill: none; stroke-width: 2; }
+.pj-bandeira .pano-entalhes { fill: none; stroke-width: 2; stroke-linecap: round; opacity: 0.8; }
+.pj-bandeira .pano-losango { stroke: var(--painel-solido); stroke-width: 1.5; }
+.pj-bandeira .pano-filete { fill: none; stroke-width: 1; opacity: 0.35; }
+
+/* ---------- nome saindo da borda esquerda + poder ---------- */
+
+.pj-nome-linha {
+  position: absolute; left: calc(-1 * var(--sangria)); top: 490px; height: 84px; z-index: 3;
+  display: flex; align-items: center; gap: 10px;
+}
+.pj-barra-nome {
+  height: 54px; min-width: calc(250px + var(--sangria)); max-width: calc(350px + var(--sangria));  /* o poder nunca chega na colmeia */
+  display: flex; align-items: center;
+  padding: 0 24px 0 calc(36px + var(--sangria));
+  background: var(--painel); backdrop-filter: blur(3px);
+  border: 3px solid var(--prata); border-left: none; border-radius: 0 4px 4px 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+}
+.pj-barra-nome .nome { flex: 1; min-width: 0; text-align: center; font-size: 30px; }
+.pj-poder { flex: none; width: 76px; height: 84px; }
+.pj .pj-poder .gema-poder { position: static; display: block; width: 76px; height: 84px; }
+.pj .pj-poder .gema-poder text { font-size: 42px; }
+
+/* ato mínimo: o pentágono de antes (frame.css), colado ao fim da barra do nome */
+.pj-ato-nome { flex: none; margin-left: -18px; z-index: 1; }
+.pj .pj-ato-nome .ato-pent { position: static; transform: none; display: block; width: 86px; height: 74px;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.55)); }
+.pj .pj-ato-nome .ato-pent text { font-size: 28px; }
+
+/* ---------- texto e palavras-chave ---------- */
+
+.pj-texto {
+  position: absolute; left: 44px; right: 44px; top: 592px; bottom: 110px;
+  display: flex; flex-direction: column;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+.pj.com-caixa .pj-texto { bottom: 192px; }
+.pj.com-chaves .pj-texto { right: 192px; }
+
+/* selos encostados (passos em dados.POSICOES_CHAVES); a sombra vai no grupo, não em cada um */
+.pj-chaves { position: absolute; right: 34px; top: 542px; width: 137px; height: 155px; z-index: 2;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.7)); }
+.pj-chave { position: absolute; }
+.pj .pj-chave .selo-chave { width: 58px; height: 64px; filter: none; }
+
+/* ---------- caixa de evolução / ascensão ---------- */
+/* embaixo à direita, por cima da linha, até as bordas de baixo e da direita (e pela sangria).
+   Borda esquerda inclinada (60 px mais para dentro no topo, dados.PJ_CAIXA_*), aba com o título
+   no topo, texto no meio e a coluna do nível à direita, separada por uma linha. */
+
+.pj-caixa {
+  position: absolute; left: 234px; top: 700px; z-index: 3;
+  right: calc(-1 * var(--sangria)); bottom: calc(-1 * var(--sangria));
+}
+/* bem transparente: a arte aparece atrás, só levemente tingida pela cor do elemento */
+.pj-caixa-fundo {
+  position: absolute; inset: 0;
+  clip-path: polygon(60px 0, 100% 0, 100% 100%, calc(60px - (180px + var(--sangria)) / 3) 100%);
+  background:
+    radial-gradient(ellipse 60% 90% at 100% 40%, color-mix(in srgb, var(--prata) 18%, transparent), transparent 70%),
+    linear-gradient(color-mix(in srgb, var(--prata) 14%, rgba(9, 10, 14, 0.34)),
+                    color-mix(in srgb, var(--prata) 10%, rgba(9, 10, 14, 0.46)));
+}
+.pj-caixa-linhas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5)); }
+.pj-caixa-linhas path { fill: none; stroke: var(--prata); stroke-linejoin: miter; }
+.pj-caixa-linhas .borda { stroke-width: 4; }
+
+/* título numa aba em paralelogramo, os lados paralelos à borda inclinada (1 px para dentro a
+   cada 3 px de altura), montada sobre a linha do topo e deslocada para a esquerda, passando da
+   borda (relevo); preenchida com a cor do tema para contrastar */
+.pj-caixa-rotulo {
+  position: absolute; left: 26px; top: -7px; width: 210px; height: 38px;
+  clip-path: polygon(12.7px 0, 100% 0, calc(100% - 12.7px) 100%, 0 100%);
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 55%, rgba(0, 0, 0, 0.18)),
+    var(--prata);
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Cinzel", serif; font-weight: 800; font-size: 18px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--texto-esq); white-space: nowrap;
+}
+.pj-caixa-texto {
+  position: absolute; left: 58px; right: calc(104px + var(--sangria)); top: 46px; bottom: calc(12px + var(--sangria));
+  overflow: hidden;
+  font-size: 17px; line-height: 1.22; font-weight: 600;
+  text-shadow: 0 0 4px #000, 0 1px 2px #000, 0 0 10px rgba(0, 0, 0, 0.8);
+}
+/* quina de baixo à direita: quarto de círculo na cor da aba, com o ícone de evolução (setas
+   para a direita) ou ascensão; avança pela sangria */
+.pj-quina {
+  position: absolute; right: calc(-1 * var(--sangria)); bottom: calc(-1 * var(--sangria)); z-index: 4;
+  width: calc(100px + var(--sangria)); height: calc(100px + var(--sangria));
+  border-top-left-radius: 100%;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 55%, rgba(0, 0, 0, 0.18)),
+    var(--prata);
+  box-shadow: -2px -2px 10px rgba(0, 0, 0, 0.45);
+  color: var(--texto-dir);
+}
+.pj .quina-icone { position: absolute; right: calc(16px + var(--sangria)); bottom: calc(14px + var(--sangria));
+  width: 50px; height: 50px; display: block; }
+
+/* ---------- base: estrela e, pequenos, número e edição ---------- */
+
+.pj-base {
+  position: absolute; left: 30px; bottom: 18px; height: 60px; right: 400px;
+  display: flex; align-items: center; gap: 8px;
+}
+/* poder e estrela: brilho em volta bem mais suave que o padrão das gemas */
+.pj .gema-poder { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--prata) 28%, transparent)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6)); }
+/* estrela lapidada (simbolos.estrela_lapidada): cores das facetas no SVG, o resto como o poder */
+.pj .estrela-lapidada { position: static; flex: none; display: block; width: 70px; height: 67px; }
+.pj .estrela-lapidada text { font-size: 32px; }
+.pj-rodape {
+  min-width: 0; display: flex; flex-direction: column; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.2;
+  color: rgba(239, 230, 210, 0.75); text-shadow: 0 1px 2px #000;
+}
+.pj:not(.com-caixa) .pj-base { right: 40px; }
+/* fora do personagem único: estrela centralizada embaixo, número à esquerda e edição à direita */
+.pj .pj-base.pj-base-centro {
+  left: 40px; right: 40px;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
+}
+.pj-base-centro > .estrela-lapidada, .pj-base-centro > .ficha-marca { grid-column: 2; grid-row: 1; }
+.pj-base-centro .pj-rodape { display: contents; }
+.pj-base-centro .pj-rodape > span { grid-row: 1; font-size: 12px; font-weight: 700;
+  color: rgba(239, 230, 210, 0.75); text-shadow: 0 1px 2px #000; }
+.pj-base-centro .pj-rodape > span:first-child { grid-column: 1; justify-self: start; }
+.pj-base-centro .pj-rodape > span:last-child { grid-column: 3; justify-self: end; }
+
+/* ---------- estandarte avançado: estrela rúnica no lugar do anel ---------- */
+.pj-bandeira .pano-estrela { stroke-width: 3; stroke-linejoin: round; }
+.pj-bandeira .pano-estrela-filete { fill: none; stroke-width: 1; stroke-linejoin: round; opacity: 0.5; }
+
+/* ---------- quest: os 3 atos no lugar do texto ---------- */
+.pj-atos {
+  position: absolute; left: 34px; right: 34px; bottom: 108px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.pj-ato, .pj-recompensa {
+  position: relative; min-height: 0;
+  background: rgba(11, 13, 19, 0.72); backdrop-filter: blur(2px);
+  border: 2px solid var(--prata); border-radius: 4px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+.pj-ato { flex: 1 1 0; display: flex; align-items: center; padding: 6px 14px 6px 56px; }
+.pj .pj-ato .ato-pent { left: -10px; top: 50%; transform: translateY(-50%); width: 58px; height: 50px; }
+.pj-ato .efeito { font-size: 18px; line-height: 1.22; max-height: 100%; }
+.pj-recompensa {
+  flex: 0 0 100px; padding: 24px 14px 8px;
+  background: linear-gradient(rgba(9, 10, 14, 0.78), rgba(9, 10, 14, 0.86)), var(--tema-grad);
+}
+.pj-recompensa-rotulo {
+  position: absolute; left: 14px; top: 5px; display: flex; align-items: center; gap: 8px;
+  font-family: "Cinzel", serif; font-weight: 700; font-size: 13px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--prata);
+}
+.pj-recompensa-rotulo::before { content: ""; width: 6px; height: 6px; background: var(--prata); transform: rotate(45deg); }
+.pj-recompensa .efeito { font-size: 17px; height: 100%; }

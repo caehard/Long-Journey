@@ -1,0 +1,39 @@
+{#
+  Quest: fita "QUEST" (rabo de andorinha) à esquerda do nome; a parte de cima fica só para a arte;
+  embaixo, 3 caixas de texto, uma por ato, cada uma com o pentágono do ato (o mesmo da ação).
+  A pilha de quests é embaralhada, então a mesma quest pode sair em qualquer ato, com uma condição
+  para cada um (livro, seções 4 e 11). Com recompensa adicional, os atos encolhem e a caixa da
+  recompensa entra embaixo. Sem círculo e sem faixa de tipo; a base com estrelas continua.
+#}
+{% extends "base.html" %}
+
+{% block circulo %}{% endblock %}
+
+{% block selos %}
+<svg class="fita-quest" viewBox="0 0 120 60" role="img" aria-label="Quest">
+  <polygon points="3,3 117,3 97,30 117,57 3,57"/>
+  <text x="52" y="31">Quest</text>
+</svg>
+{% endblock %}
+
+{% block faixa %}{% endblock %}
+
+{% block zona_texto %}
+<div class="quest-atos{% if c.recompensa %} com-recompensa{% endif %}">
+  {% for texto in c.atos %}
+  <div class="quest-ato">
+    <svg class="ato-pent" viewBox="0 0 70 60" role="img" aria-label="ato {{ loop.index }}">
+      <polygon points="3,3 44,3 67,30 44,57 3,57"/>
+      <text x="30" y="31">{{ loop.index|romano }}</text>
+    </svg>
+    <div class="quest-texto efeito ajustar-altura">{{ texto|marcacao }}</div>
+  </div>
+  {% endfor %}
+  {% if c.recompensa %}
+  <div class="quest-recompensa">
+    <div class="recompensa-rotulo">Recompensa adicional</div>
+    <div class="quest-texto efeito ajustar-altura">{{ c.recompensa|marcacao }}</div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

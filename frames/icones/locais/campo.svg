@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- campo de batalha: bandeira de guerra, com a ponta partida, fincada num monte -->
+  <path d="M34 78 V12" stroke="#efe6d2" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="34,6 30,14 38,14" fill="#efe6d2"/>
+  <path d="M38 16 C52 10 62 22 82 16 L72 31 L82 46 C62 52 52 40 38 46 Z" fill="#efe6d2"/>
+  <path d="M8 90 Q50 62 92 90 Z" fill="#efe6d2"/>
+</svg>

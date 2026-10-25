@@ -1,0 +1,6 @@
+# gerado (refaça com: python gerar.py --folha)
+out/
+
+# cache do Python
+__pycache__/
+*.pyc

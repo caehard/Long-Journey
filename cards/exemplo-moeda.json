@@ -1,0 +1,9 @@
+{
+  "tipo": "item",
+  "nome": "Moeda",
+  "numero": "021",
+  "ficha": true,
+  "slot": "acessório",
+  "texto": "Gaste moedas com **Abra o mercado** para trazer ao jogo um item com custo em moedas.",
+  "ambientacao": "Todo herói tem um preço. Todo mercador sabe qual é."
+}

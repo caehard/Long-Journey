@@ -1,0 +1,106 @@
+{#
+  Frame comum de todas as cartas (nasceu do personagem). Estilos em layout.css. De cima para baixo:
+  - moldura na cor do tema, um pouco para dentro da borda, com chanfros, interrompida sob o
+    estandarte, a barra do nome e a caixa (trechos em dados._cortes_moldura);
+  - à esquerda, o texto vertical (raça e clã/função; nos outros tipos, o tipo e o subtipo); à
+    direita, o estandarte pendurado do topo (simbolos.bandeira): medalhão, círculo preso a ele
+    (coroa, ato, ícone do local, moedas) e classe;
+  - pouco abaixo do meio, a barra do nome saindo da borda esquerda e, colado a ela, o poder
+    (personagem) ou o pentágono do ato mínimo (ação, item, campo, retiro, runa);
+  - texto à esquerda, ambientação embaixo se sobrar espaço, e a colmeia de palavras-chave à
+    direita (personagem); na quest, os 3 atos no lugar do texto;
+  - personagem: embaixo à direita, a caixa de evolução ou ascensão e a quina com o ícone;
+  - embaixo, fora da linha, a estrela com o custo (ou "Ficha") e número e edição: à esquerda no
+    personagem único; centralizada nos outros tipos, com o número à esquerda e a edição à direita.
+#}
+<div data-id="{{ id }}" class="carta frame pj tipo-{{ c.tipo }}{% if c.criterio_rotulo %} com-caixa{% endif %}{% if c.chaves_pos %} com-chaves{% endif %}{% if not sangria %} sem-sangria{% endif %}"
+     style="--sangria: {{ sangria }}px; --tinta: {{ c.tinta }}; --prata: {{ c.tema.a }}; --tema-grad: {{ c.tema.grad }}; --texto-esq: {{ c.tema.texto_esq }}; --texto-dir: {{ c.tema.texto_dir }};{% if c.arte_posicao %} --arte-pos: {{ c.arte_posicao }};{% endif %}{% if c.arte_zoom %} --arte-zoom: {{ c.arte_zoom }};{% endif %}">
+  <div class="arte">
+    {% if c.arte_url %}<img src="{{ c.arte_url }}" alt="">{% else %}<div class="arte-vazia">ARTE</div>{% endif %}
+  </div>
+  <div class="corte">
+    <div class="vinheta"></div>
+    <div class="veu"></div>
+    <svg class="pj-moldura" viewBox="0 0 630 880" aria-hidden="true">
+      <defs><linearGradient id="moldura-{{ id }}" x1="0" y1="0" x2="630" y2="0" gradientUnits="userSpaceOnUse">
+        {% for cor, ini, fim in c.tema.paradas %}<stop offset="{{ ini }}%" stop-color="{{ cor }}"/><stop offset="{{ fim }}%" stop-color="{{ cor }}"/>{% endfor %}
+      </linearGradient></defs>
+      <path d="{{ c.moldura_caminho }}" fill="url(#moldura-{{ id }})"/>
+    </svg>
+
+    {% if c.linhas_raca %}
+    <div class="pj-raca ajustar-vertical">{% for linha in c.linhas_raca %}<div>{{ linha }}</div>{% endfor %}</div>
+    {% endif %}
+
+    {% if c.bandeira %}<div class="pj-pano">{{ c.bandeira }}</div>{% endif %}
+
+    <div class="pj-nome-linha"{% if c.nome_topo is defined %} style="top: {{ c.nome_topo - 15 }}px"{% endif %}>
+      <div class="pj-barra-nome"><div class="nome ajustar-largura">{{ c.nome }}</div></div>
+      {% if c.poder_svg %}<div class="pj-poder">{{ c.poder_svg }}</div>{% endif %}
+      {# ato mínimo (ação, item, campo, retiro, runa): o pentágono de sempre, colado ao nome #}
+      {% if c.ato_minimo %}
+      <div class="pj-ato-nome">
+        <svg class="ato-pent" viewBox="0 0 70 60" role="img" aria-label="ato mínimo {{ c.ato_minimo }}">
+          <polygon points="3,3 44,3 67,30 44,57 3,57"/>
+          <text x="30" y="31">{{ c.ato_minimo|romano }}</text>
+        </svg>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if c.atos %}
+    {# quest: um texto por ato, cada um com o pentágono do ato; recompensa adicional embaixo #}
+    <div class="pj-atos" style="top: {{ c.nome_topo + 76 }}px">
+      {% for texto in c.atos %}
+      <div class="pj-ato">
+        <svg class="ato-pent" viewBox="0 0 70 60" role="img" aria-label="ato {{ loop.index }}">
+          <polygon points="3,3 44,3 67,30 44,57 3,57"/>
+          <text x="30" y="31">{{ loop.index|romano }}</text>
+        </svg>
+        <div class="efeito ajustar-altura">{{ texto|marcacao }}</div>
+      </div>
+      {% endfor %}
+      {% if c.recompensa %}
+      <div class="pj-recompensa">
+        <div class="pj-recompensa-rotulo">Recompensa adicional</div>
+        <div class="efeito ajustar-altura">{{ c.recompensa|marcacao }}</div>
+      </div>
+      {% endif %}
+    </div>
+    {% elif not c.sem_texto %}
+    <div class="pj-texto">
+      <div class="efeito ajustar-altura">{{ c.texto|marcacao }}</div>
+      {% if c.ambientacao %}<div class="ambientacao opcional">{{ c.ambientacao|marcacao_linha }}</div>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if c.chaves_pos %}
+    <div class="pj-chaves">
+      {% for svg, x, y in c.chaves_pos %}<div class="pj-chave" style="left: {{ x }}px; top: {{ y }}px">{{ svg }}</div>{% endfor %}
+    </div>
+    {% endif %}
+
+    {% if c.criterio_rotulo %}
+    <div class="pj-caixa pj-caixa-{{ c.lado }}">
+      {# fundo recortado com a borda esquerda inclinada e a linha da borda por cima #}
+      <div class="pj-caixa-fundo"></div>
+      <svg class="pj-caixa-linhas" aria-hidden="true"><path class="borda" d="M-24 252 L60 0 H460"/></svg>
+      {# título numa aba em paralelogramo sobre a linha do topo, na cor do tema, deslocada para a
+         esquerda (passa da borda inclinada) para dar relevo #}
+      <div class="pj-caixa-rotulo"><span>{{ c.criterio_rotulo }}</span></div>
+      <div class="pj-caixa-texto ajustar-altura">{{ c.criterio|marcacao_linha }}</div>
+    </div>
+    {# quina de baixo à direita, na cor da aba, com o ícone de evolução ou ascensão #}
+    {% if c.quina_svg %}<div class="pj-quina">{{ c.quina_svg }}</div>{% endif %}
+    {% endif %}
+
+    <footer class="pj-base{% if c.base_centro %} pj-base-centro{% endif %}">
+      {% if c.ficha %}
+      <span class="ficha-marca">Ficha</span>
+      {% else %}
+      {{ c.estrela_svg }}
+      {% endif %}
+      <span class="pj-rodape">{% if c.rotulo_numero %}<span>{{ c.rotulo_numero }}</span>{% endif %}<span>{{ c.rotulo_edicao }}</span></span>
+    </footer>
+  </div>
+</div>

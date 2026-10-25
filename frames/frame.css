@@ -1,0 +1,330 @@
+/*
+  Frame comum (frames/base.html), nascido da carta de ação.
+  Mesma escala de carta.css: 10 px = 1 mm, área de corte 630 x 880 px.
+*/
+
+/* véu escuro sobre a metade de baixo da arte, atrás do texto */
+.frame .veu {
+  position: absolute; left: 0; right: 0; top: 420px; bottom: 0; pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(11, 13, 19, 0) 0, rgba(11, 13, 19, 0.74) 90px, rgba(11, 13, 19, 0.8) 100%);
+}
+/* rótulo do espaço reservado acima da barra de tipo */
+.frame .arte-vazia { align-items: flex-start; padding-top: 240px; }
+
+.frame .vinheta {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 16%);
+}
+
+/* borda das barras nas cores do tema: um ::before com o gradiente,
+   recortado por máscara para sobrar só a faixa da borda */
+.frame .barra-nome::before, .frame .barra-tipo::before {
+  content: ""; position: absolute; pointer-events: none;
+  background: var(--tema-grad);
+  border-radius: inherit;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.frame .barra-nome::before { inset: -2px 0; padding: 2px 0; }
+.frame .barra-tipo::before { inset: -2px -2px -2px 0; padding: 2px 2px 2px 0; }
+.frame .barra-tipo:not(.com-classe)::before { inset: -2px; padding: 2px; }
+
+/* ---------- topo: pentágono do ato + barra do nome + círculo ---------- */
+
+.frame .cabecalho { position: absolute; left: 0; right: 0; top: 22px; height: 96px; }
+
+.frame .barra-nome {
+  position: absolute; left: 60px; right: 72px; top: 24px; height: 50px;
+  background: var(--painel);
+  border-top: 2px solid transparent; border-bottom: 2px solid transparent;
+  display: flex; align-items: center;
+  padding: 0 52px 0 38px;
+  backdrop-filter: blur(3px);
+}
+.frame .nome {
+  flex: 1; min-width: 0; text-align: center;
+  font-size: 32px;
+}
+/* sem pentágono (personagem, campo básico...) ou sem círculo: a barra ocupa o espaço */
+.frame .sem-pent .barra-nome { left: 22px; padding-left: 20px; border-left: 2px solid transparent; }
+.frame .sem-pent .barra-nome::before { inset: -2px 0 -2px -2px; padding: 2px 0 2px 2px; }
+.frame .sem-circulo .barra-nome { right: 22px; padding-right: 20px; border-right: 2px solid transparent; }
+.frame .sem-circulo .barra-nome::before { right: -2px; padding-right: 2px; }
+
+.frame .ato-pent { position: absolute; left: 20px; top: 18px; width: 70px; height: 60px; overflow: visible; }
+.frame .ato-pent polygon { fill: var(--painel-solido); stroke: var(--prata); stroke-width: 3; stroke-linejoin: round; }
+.frame .ato-pent text {
+  font-family: "Cinzel", serif; font-weight: 700; font-size: 27px;
+  fill: var(--creme); text-anchor: middle; dominant-baseline: central;
+}
+
+.frame .circulo-topo { position: absolute; right: 18px; top: 0; width: 96px; height: 96px; }
+.frame .circulo-topo .elementos { width: 96px; height: 96px; }
+
+
+/* ---------- meio: estandarte + barra de tipo + símbolos dos subtipos ---------- */
+
+.frame .linha-tipo {
+  position: absolute; left: 22px; right: 22px; top: 420px; height: 112px;
+  display: flex; align-items: flex-start;
+}
+.frame .bandeiras {
+  position: relative; z-index: 2; flex: none;
+  display: flex; gap: 4px; margin-right: -46px;
+}
+.frame .bandeiras .estandarte { height: 112px; width: 89.6px; margin: 0; }
+.frame .bandeiras .hex { width: 70px; height: 61px; font-size: 18px; margin-top: 14px; }
+
+.frame .barra-tipo {
+  position: relative;
+  flex: 1; min-width: 0; height: 46px; margin-top: 16px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 8px 0 22px;
+  background: var(--painel);
+  border: 2px solid transparent; border-left: none;
+  border-radius: 0 23px 23px 0;
+  backdrop-filter: blur(3px);
+}
+.frame .barra-tipo:not(.com-classe) { border-left: 2px solid transparent; border-radius: 23px; }
+.frame .barra-tipo.com-classe { padding-left: 62px; }
+
+/* centralizado na barra inteira, independente do estandarte e dos símbolos */
+.frame .tipo-texto {
+  position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+  display: flex; align-items: center; justify-content: center; pointer-events: none;
+  font-family: "Cinzel", serif; font-weight: 700;
+  font-size: 19px; letter-spacing: 1.5px; text-transform: uppercase;
+  white-space: nowrap; overflow: hidden;
+  padding: 0 86px;  /* simétrico; o ajuste em render.py recalcula pela largura real dos símbolos */
+}
+.frame .sub-simbolos { flex: none; display: flex; gap: 5px; margin-left: auto; }
+.frame .sub-simbolo {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 2px solid var(--cinza); background: var(--painel-solido);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+}
+.frame .sub-simbolo img { width: 21px; height: 21px; }
+.frame .sub-simbolo.com-valor { width: auto; padding: 0 9px; gap: 3px; border-radius: 17px; }
+
+/* ---------- texto sobre a arte ---------- */
+
+.frame .texto-carta {
+  position: absolute; left: 44px; right: 44px; top: 556px; bottom: 100px;
+  display: flex; flex-direction: column;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+.frame .efeito { font-size: 22px; line-height: 1.3; }
+.frame .ambientacao {
+  flex: none; margin-top: 10px; padding-top: 8px;
+  border-top: 1px solid rgba(195, 201, 212, 0.55);
+  font-size: 17px; line-height: 1.25; font-style: italic; color: #c3c7d4;
+}
+
+/* ---------- gemas: nível mínimo (triângulo) e poder (hexágono) do personagem ----------
+   Três facetas (clara, média, escura) da cor do tema, filete claro, contorno escuro e brilho.
+   Fica acima da borda e do trapézio. */
+
+.frame .gema { position: absolute; z-index: 4; overflow: visible;
+  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--prata) 65%, transparent)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.7)); }
+.frame .gema .f-clara { fill: color-mix(in srgb, var(--prata) 58%, white); }
+.frame .gema .f-media { fill: var(--prata); }
+.frame .gema .f-escura { fill: color-mix(in srgb, var(--prata) 62%, black); }
+.frame .gema .filete { fill: none; stroke: rgba(255, 255, 255, 0.6); stroke-width: 1.5; stroke-linejoin: round; }
+.frame .gema .contorno { fill: none; stroke: var(--painel-solido); stroke-width: 4; stroke-linejoin: round; }
+.frame .gema text {
+  font-family: "Source Sans 3", sans-serif; font-weight: 800; font-size: 26px;
+  fill: #f8f5ee; stroke: #11131a; stroke-width: 6; stroke-linejoin: round; paint-order: stroke;
+  text-anchor: middle; dominant-baseline: central;
+}
+/* poder: hexágono lapidado; o tamanho e o lugar ficam em personagem.css */
+.frame .gema-poder text { font-size: 40px; }
+.frame .gema-poder .contorno-fundo { fill: var(--painel-solido); }
+/* luz de cima à esquerda: facetas de cima claras, de baixo escuras */
+.frame .gema-poder .f-ce { fill: color-mix(in srgb, var(--prata) 52%, white); }
+.frame .gema-poder .f-cd { fill: color-mix(in srgb, var(--prata) 72%, white); }
+.frame .gema-poder .f-e  { fill: color-mix(in srgb, var(--prata) 86%, white); }
+.frame .gema-poder .f-d  { fill: var(--prata); }
+.frame .gema-poder .f-be { fill: color-mix(in srgb, var(--prata) 72%, black); }
+.frame .gema-poder .f-bd { fill: color-mix(in srgb, var(--prata) 52%, black); }
+.frame .gema-poder .mesa { fill: color-mix(in srgb, var(--prata) 88%, black); stroke: color-mix(in srgb, var(--prata) 40%, white); stroke-width: 1.5; }
+.frame .gema-poder .mesa-luz { fill: url(#poder-luz); }
+.frame .gema-poder .reflexo { fill: rgba(255, 255, 255, 0.42); }
+.frame .gema-poder .filete { stroke: rgba(255, 255, 255, 0.45); stroke-width: 1.2; }
+
+/* palavras-chave: selos hexagonais (a colmeia do personagem fica em personagem.css) */
+.frame .selo-chave { width: 58px; height: 64px; display: block; overflow: visible;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.7)); }
+.frame .selo-chave .hex-fundo { fill: var(--painel-solido); stroke: var(--prata); stroke-width: 5; stroke-linejoin: round; }
+.frame .selo-chave .hex-filete { fill: none; stroke: color-mix(in srgb, var(--prata) 40%, transparent); stroke-width: 1.5; }
+/* valor ("Escudo 2") dentro do hexágono, embaixo do glifo */
+.frame .selo-chave .chave-valor {
+  font-family: "Source Sans 3", sans-serif; font-weight: 800; font-size: 30px;
+  fill: var(--creme); stroke: var(--painel-solido); stroke-width: 5; stroke-linejoin: round; paint-order: stroke;
+  text-anchor: middle; dominant-baseline: central;
+}
+.frame .base-vazio { flex: none; width: 90px; }
+
+/* rodapé com rótulo: INIMIGO da quest */
+.frame .criterio {
+  flex: none; margin-top: 10px; padding-top: 8px;
+  border-top: 1.5px solid var(--prata);
+  font-size: 17px; line-height: 1.25;
+}
+.frame .criterio-rotulo {
+  font-family: "Cinzel", serif; font-weight: 700; font-size: 16px; letter-spacing: 1px;
+  color: var(--prata); margin-right: 8px;
+}
+
+/* ---------- borda: linha fina nas laterais e no topo, na cor do tema ---------- */
+/* fica na linha de corte e avança pela sangria; embaixo some sob o trapézio */
+
+.frame .borda-tema {
+  position: absolute; inset: calc(-1 * var(--sangria)); pointer-events: none;
+  padding: calc(6px + var(--sangria));
+  background: var(--tema-grad);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.frame.sem-sangria .borda-tema { border-radius: 30px; }
+
+/* ---------- item: arco com o medalhão do slot no topo ---------- */
+
+.frame.tipo-item .veu { display: none; }  /* o arco faz o papel do véu */
+.frame .arco-item { position: absolute; inset: 0; width: 630px; height: 880px; pointer-events: none; }
+.frame .arco-painel { fill: rgba(11, 13, 19, 0.86); }
+.frame .arco-linha { fill: none; stroke: var(--prata); stroke-width: 3; stroke-linejoin: round; }
+.frame .medalhao-slot { position: absolute; left: 50%; top: 468px; transform: translate(-50%, -50%); width: 104px; height: 104px; z-index: 3; }
+.frame .medalhao { width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7)); }
+.frame .medalhao .med-fundo { fill: var(--painel-solido); stroke: var(--prata); stroke-width: 4; }
+.frame .medalhao .med-filete { fill: none; stroke: color-mix(in srgb, var(--prata) 40%, transparent); stroke-width: 1.5; }
+.frame .medalhao.lendario { filter: drop-shadow(0 0 8px color-mix(in srgb, var(--prata) 60%, transparent)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7)); }
+.frame .medalhao .med-anel-ext { fill: var(--painel-solido); stroke: var(--prata); stroke-width: 2; }
+.frame .medalhao .med-losango { fill: var(--prata); stroke: var(--painel-solido); stroke-width: 1.5; }
+/* o texto começa abaixo do ponto mais baixo do telhado (578 px), para nenhuma linha cruzar as retas */
+.frame.tipo-item .texto-carta { top: 592px; left: 50px; right: 50px; bottom: 80px; text-align: center; }
+
+/* ---------- quest ---------- */
+
+.frame.tipo-quest .veu { display: none; }
+/* fita "QUEST" à esquerda do nome, com rabo de andorinha */
+.frame .fita-quest { position: absolute; left: 14px; top: 38px; width: 124px; height: 62px; z-index: 2; overflow: visible; }
+.frame .fita-quest polygon { fill: var(--painel-solido); stroke: var(--prata); stroke-width: 3; stroke-linejoin: round; }
+.frame .fita-quest text {
+  font-family: "Cinzel", serif; font-weight: 700; font-size: 17px; letter-spacing: 2px; text-transform: uppercase;
+  fill: var(--creme); text-anchor: middle; dominant-baseline: central;
+}
+.frame.tipo-quest .barra-nome { padding-left: 128px; }
+
+/* a parte de cima fica só para a arte; os atos (e a recompensa) ficam da metade para baixo */
+.frame .quest-atos {
+  position: absolute; left: 22px; right: 22px; top: 436px; bottom: 64px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.frame .quest-ato, .frame .quest-recompensa {
+  position: relative; min-height: 0;
+  background: rgba(11, 13, 19, 0.88);
+  border: 2px solid var(--prata); border-radius: 6px;
+  backdrop-filter: blur(2px);
+}
+.frame .quest-ato { flex: 1 1 0; padding: 8px 18px 8px 70px; }
+.frame .quest-ato .ato-pent { left: -12px; top: 50%; transform: translateY(-50%); width: 62px; height: 53px; }
+.frame .quest-texto {
+  height: 100%; display: flex; flex-direction: column; justify-content: center;
+  font-size: 19px; line-height: 1.25;
+}
+/* recompensa adicional: os atos encolhem e ela entra embaixo, com rótulo e fundo tingido */
+.frame .quest-recompensa {
+  flex: 0 0 116px; padding: 26px 20px 8px;
+  background: linear-gradient(rgba(9, 10, 14, 0.8), rgba(9, 10, 14, 0.86)), var(--tema-grad);
+}
+.frame .recompensa-rotulo {
+  position: absolute; left: 18px; top: 7px;
+  display: flex; align-items: center; gap: 8px;
+  font-family: "Cinzel", serif; font-weight: 700; font-size: 13px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--prata);
+}
+.frame .recompensa-rotulo::before { content: ""; width: 6px; height: 6px; background: var(--prata); transform: rotate(45deg); }
+.frame .quest-recompensa .quest-texto { font-size: 18px; }
+
+/* ---------- campo e retiro: ícone do tipo à esquerda da barra do nome, espelhando o círculo ---------- */
+
+.frame.tipo-campo .barra-nome, .frame.tipo-retiro .barra-nome { left: 72px; padding-left: 52px; }
+.frame .icone-local-topo { position: absolute; left: 18px; top: 22px; width: 96px; height: 96px; z-index: 2; }
+.frame .icone-local-topo .icone-local { width: 96px; height: 96px; display: block; }
+.frame .icone-local-topo:has(.moldura-avancada) { left: 8px; top: 12px; width: 116px; height: 116px; }
+.frame .icone-local-topo .moldura-avancada { width: 116px; height: 116px; overflow: visible;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--prata) 55%, transparent)); }
+.frame.tipo-campo .cabecalho:has(~ .icone-local-topo .moldura-avancada) .barra-nome,
+.frame.tipo-retiro .cabecalho:has(~ .icone-local-topo .moldura-avancada) .barra-nome { padding-left: 64px; }
+
+/* ---------- runa: básica só com nome, elemento e arte; avançada com moldura rúnica e caixa ---------- */
+
+.frame.tipo-runa .veu { display: none; }
+/* a moldura é maior que o círculo comum, mas o centro do elemento fica no mesmo lugar */
+.frame .circulo-topo:has(.moldura-avancada) { right: 8px; top: -10px; width: 116px; height: 116px; }
+.frame .circulo-topo .moldura-avancada { width: 116px; height: 116px; overflow: visible;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--prata) 55%, transparent)); }
+.frame .moldura-estrela { stroke-width: 3; stroke-linejoin: round; }
+.frame .moldura-estrela-filete { fill: none; stroke-width: 1; stroke-linejoin: round; opacity: 0.5; }
+.frame .moldura-anel { fill: none; stroke-width: 1.5; opacity: 0.8; }
+.frame .moldura-entalhes path { stroke-width: 2.5; stroke-linecap: round; }
+.frame.tipo-runa .cabecalho:has(.moldura-avancada) .barra-nome { padding-right: 64px; }
+
+.frame .runa-caixa {
+  position: absolute; left: 22px; right: 22px; top: 566px; bottom: 64px;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 30px 28px 14px; text-align: center;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 0, color-mix(in srgb, var(--prata) 26%, transparent), transparent 70%),
+    linear-gradient(rgba(9, 10, 14, 0.82), rgba(9, 10, 14, 0.88)),
+    var(--tema-grad);
+  border: 2px solid var(--prata); border-radius: 6px;
+  box-shadow: inset 0 0 0 4px rgba(9, 10, 14, 0.6), inset 0 0 0 5px color-mix(in srgb, var(--prata) 45%, transparent);
+  backdrop-filter: blur(2px);
+}
+.frame .runa-caixa .efeito { flex: 0 1 auto; min-height: 0; overflow: hidden; }
+.frame .runa-caixa .ambientacao { border-top-color: color-mix(in srgb, var(--prata) 45%, transparent); }
+/* rótulo em aba, montado na borda de cima da caixa */
+.frame .runa-rotulo {
+  position: absolute; left: 50%; top: -15px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px; padding: 3px 18px;
+  background: var(--painel-solido); border: 2px solid var(--prata); border-radius: 15px;
+  font-family: "Cinzel", serif; font-weight: 700; font-size: 15px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--creme); white-space: nowrap;
+}
+.frame .runa-rotulo::before, .frame .runa-rotulo::after {
+  content: ""; width: 6px; height: 6px; background: var(--prata); transform: rotate(45deg);
+}
+
+/* ---------- cantos de baixo, nos chanfros do trapézio: cor do tema escurecida ---------- */
+
+.frame .base-cantos {
+  position: absolute; left: calc(-1 * var(--sangria)); right: calc(-1 * var(--sangria));
+  bottom: calc(-1 * var(--sangria)); height: calc(50px + var(--sangria));
+  background: linear-gradient(rgba(6, 7, 10, 0.5), rgba(6, 7, 10, 0.5)), var(--tema-grad);
+}
+
+/* ---------- base: trapézio na cor do tema ---------- */
+/* vai da borda de baixo (e da sangria, se houver) até 50 px acima dela */
+
+.frame .base-trapezio {
+  position: absolute; left: calc(-1 * var(--sangria)); right: calc(-1 * var(--sangria));
+  bottom: calc(-1 * var(--sangria)); height: calc(50px + var(--sangria));
+  padding: 0 calc(96px + var(--sangria)) var(--sangria);
+  background: var(--tema-grad);
+  clip-path: polygon(0 100%, 100% 100%, calc(100% - 64px - var(--sangria)) 0, calc(64px + var(--sangria)) 0);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; font-weight: 700;
+}
+.frame .base-num, .frame .base-edicao { flex: 1 1 0; }
+.frame .base-num { color: var(--texto-esq); }
+.frame .base-edicao { color: var(--texto-dir); text-align: right; }
+
+.frame .estrela-custo { flex: none; width: 48px; height: 46px; margin-top: 2px; }
+/* contorno: cor do tema escurecida, definido no SVG (simbolos.tema) */
+.frame .estrela-custo path { fill: var(--painel-solido); stroke-width: 6; stroke-linejoin: round; }
+.frame .estrela-custo text {
+  font-family: "Source Sans 3", sans-serif; font-weight: 800; font-size: 40px;
+  fill: #f4f1ea; text-anchor: middle; dominant-baseline: central;
+}

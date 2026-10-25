@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <g fill="none" stroke="#d8434f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="50" cy="50" r="45" stroke-width="5"/>
+    <circle cx="50" cy="50" r="7" fill="#d8434f" stroke="none"/>
+    <path d="M50 39 L50 23" stroke-width="4.5"/>
+    <path d="M50 12 L56 23 L44 23 Z" fill="#d8434f" stroke-width="2"/>
+    <path d="M57.78 42.22 L69.09 30.91" stroke-width="4.5"/>
+    <path d="M76.87 23.13 L73.33 35.15 L64.85 26.67 Z" fill="#d8434f" stroke-width="2"/>
+    <path d="M61 50 L77 50" stroke-width="4.5"/>
+    <path d="M88 50 L77 56 L77 44 Z" fill="#d8434f" stroke-width="2"/>
+    <path d="M57.78 57.78 L69.09 69.09" stroke-width="4.5"/>
+    <path d="M76.87 76.87 L64.85 73.33 L73.33 64.85 Z" fill="#d8434f" stroke-width="2"/>
+    <path d="M50 61 L50 77" stroke-width="4.5"/>
+    <path d="M50 88 L44 77 L56 77 Z" fill="#d8434f" stroke-width="2"/>
+    <path d="M42.22 57.78 L30.91 69.09" stroke-width="4.5"/>
+    <path d="M23.13 76.87 L26.67 64.85 L35.15 73.33 Z" fill="#d8434f" stroke-width="2"/>
+    <path d="M39 50 L23 50" stroke-width="4.5"/>
+    <path d="M12 50 L23 44 L23 56 Z" fill="#d8434f" stroke-width="2"/>
+    <path d="M42.22 42.22 L30.91 30.91" stroke-width="4.5"/>
+    <path d="M23.13 23.13 L35.15 26.67 L26.67 35.15 Z" fill="#d8434f" stroke-width="2"/>
+  </g>
+</svg>

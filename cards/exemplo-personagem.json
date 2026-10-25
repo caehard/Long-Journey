@@ -1,0 +1,27 @@
+{
+  "tipo": "personagem",
+  "nome": "Aria, a Andarilha",
+  "numero": "010",
+  "estrelas": 18,
+  "elemento": "alma",
+  "classes": [
+    "ladino",
+    "mercador"
+  ],
+  "raca": "Humana",
+  "cla": "Vento Norte",
+  "funcao": "Batedora",
+  "frente": {
+    "poder": 2,
+    "texto": "Elusivo 1. Distante.\nAo início da sua Saga, olhe a carta do topo da sua Jornada. Você pode colocá-la no fundo.",
+    "evolui_nivel": 3,
+    "evolui": "Ter jogado 2 ações Leves no mesmo turno."
+  },
+  "verso": {
+    "nome": "Aria, Senhora dos Ventos",
+    "poder": 4,
+    "ascensao_nivel": 8,
+    "texto": "Elusivo 2. Distante. Perceptivo 1.\nSuas ações Leves custam 1 carga a menos (mínimo 0).",
+    "ascende": "Controlar o campo de batalha de Alma."
+  }
+}

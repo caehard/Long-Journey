@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- moeda de trás: só a borda clara (mais fina); o miolo tem a cor do fundo do círculo -->
+  <ellipse cx="44" cy="58" rx="33" ry="23" fill="#11131a" stroke="#e2e6ed" stroke-width="4.5"/>
+  <!-- moeda da frente: o mesmo formato, deslocado para a direita e para cima, de uma cor só -->
+  <ellipse cx="56" cy="44" rx="33" ry="23" fill="#e2e6ed"/>
+</svg>

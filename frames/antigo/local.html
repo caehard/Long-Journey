@@ -1,0 +1,7 @@
+{# Campo de batalha e retiro (a runa tem runa.html): mesmo frame, muda só a linha de tipo.
+   À esquerda da barra do nome, no lugar do pentágono, o ícone do tipo (simbolos.circulo_local);
+   avançado, dentro da mesma moldura rúnica da runa avançada. #}
+{% extends "base.html" %}
+
+{% block selos %}<div class="icone-local-topo">{{ c.icone_local }}</div>{% endblock %}
+{% block tipo %}{{ c.linha_tipo }}{% endblock %}

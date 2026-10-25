@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Criador de Cartas</title>
+<link rel="icon" href="data:,">
+<style>
+  @font-face { font-family: "Cinzel"; src: url("/raiz/frames/fontes/Cinzel.ttf"); font-weight: 400 900; }
+  @font-face { font-family: "Source Sans 3"; src: url("/raiz/frames/fontes/SourceSans3.ttf"); font-weight: 200 900; }
+
+  :root {
+    --fundo: #171a24; --painel: #1f2433; --painel-2: #262c3d; --linha: #343b50;
+    --prata: #c3c9d4; --prata-clara: #eef0f4; --creme: #efe6d2; --cinza: #9aa0b4;
+    --erro: #ff7a7a; --aviso: #f0c062; --ok: #7fd18b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fundo); color: var(--creme); font: 15px/1.4 "Source Sans 3", system-ui, sans-serif; height: 100vh; display: flex; flex-direction: column; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+
+  header {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 10px 18px; background: var(--painel); border-bottom: 1px solid var(--linha);
+  }
+  header h1 { font: 700 20px "Cinzel", serif; margin: 0 12px 0 0; color: var(--prata-clara); letter-spacing: 1px; }
+  .espaco { flex: 1; }
+  .estado { font-size: 13px; color: var(--cinza); }
+  .estado.sujo { color: var(--aviso); }
+
+  .botao {
+    background: var(--painel-2); border: 1px solid var(--linha); border-radius: 8px;
+    padding: 7px 14px; cursor: pointer;
+  }
+  .botao:hover { border-color: var(--prata); }
+  .botao.principal { background: var(--prata); border-color: var(--prata); color: #15181f; font-weight: 700; }
+  .botao.principal:hover { background: var(--prata-clara); }
+  .botao:disabled { opacity: .5; cursor: wait; }
+  select, input[type=text], input[type=number], textarea {
+    background: #12151e; border: 1px solid var(--linha); border-radius: 8px; padding: 7px 10px; width: 100%;
+  }
+  select:focus, input:focus, textarea:focus { outline: none; border-color: var(--prata); }
+  header select { width: auto; min-width: 220px; }
+
+  main { flex: 1; min-height: 0; display: grid; grid-template-columns: 430px 1fr; }
+  aside { overflow-y: auto; padding: 14px 18px 40px; border-right: 1px solid var(--linha); }
+
+  fieldset { border: none; margin: 0 0 18px; padding: 0; }
+  legend { font: 700 13px "Cinzel", serif; letter-spacing: 1.5px; color: var(--prata); text-transform: uppercase; margin-bottom: 8px; padding: 0; }
+  label { display: block; font-size: 13px; color: var(--cinza); margin: 10px 0 4px; }
+  .linha { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .linha label { margin-top: 0; }
+  .dica { font-size: 12px; color: var(--cinza); margin-top: 4px; }
+  textarea { resize: vertical; min-height: 70px; }
+  .check { display: flex; align-items: center; gap: 8px; color: var(--creme); font-size: 14px; margin-top: 10px; }
+
+  .segmentado { display: inline-flex; border: 1px solid var(--linha); border-radius: 8px; overflow: hidden; }
+  .segmentado button { background: #12151e; border: none; padding: 6px 16px; cursor: pointer; font-family: "Cinzel", serif; font-weight: 700; }
+  .segmentado button + button { border-left: 1px solid var(--linha); }
+  .segmentado button.ativo { background: var(--prata); color: #15181f; }
+
+  .fichas { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ficha {
+    position: relative; display: flex; align-items: center; gap: 6px;
+    background: #12151e; border: 1px solid var(--linha); border-radius: 20px;
+    padding: 4px 12px 4px 5px; cursor: pointer; font-size: 14px;
+  }
+  .ficha img { width: 24px; height: 24px; }
+  .ficha.estandarte img { width: 20px; height: 25px; }
+  .ficha:hover { border-color: var(--cinza); }
+  .ficha.ativo { border-color: var(--prata); background: #262a33; }
+  .ficha .ordem {
+    position: absolute; top: -6px; right: -4px; min-width: 17px; height: 17px; border-radius: 9px;
+    background: var(--prata); color: #15181f; font-size: 11px; font-weight: 700;
+    display: none; align-items: center; justify-content: center;
+  }
+  .ficha.ativo .ordem { display: flex; }
+  .ficha.ativo .ordem:empty { display: none; }
+
+  .stepper { display: flex; align-items: center; gap: 0; }
+  .stepper button { width: 34px; height: 36px; background: var(--painel-2); border: 1px solid var(--linha); cursor: pointer; }
+  .stepper button:first-child { border-radius: 8px 0 0 8px; }
+  .stepper button:last-child { border-radius: 0 8px 8px 0; }
+  .stepper input { border-radius: 0; text-align: center; width: 56px; height: 36px; }
+
+  input[type=range] { width: 100%; accent-color: var(--prata); }
+  details summary { cursor: pointer; color: var(--prata); font: 700 13px "Cinzel", serif; letter-spacing: 1.5px; text-transform: uppercase; }
+  #json { font: 13px/1.4 Consolas, monospace; min-height: 260px; margin-top: 8px; }
+  #json.invalido { border-color: var(--erro); }
+
+  section.previa { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  .palco { flex: 1; min-height: 0; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 20px;
+           background: radial-gradient(ellipse at center, #232838 0%, #14161e 75%); }
+  .palco iframe { border: none; background: transparent; transform-origin: center center; flex: none; }
+  .barra-previa { display: flex; align-items: center; gap: 10px; padding: 8px 18px; border-top: 1px solid var(--linha); background: var(--painel); font-size: 13px; }
+  .mensagens { max-height: 150px; overflow-y: auto; padding: 0 18px; background: var(--painel); }
+  .mensagens div { padding: 3px 0; font-size: 13px; }
+  .mensagens .erro { color: var(--erro); }
+  .mensagens .aviso { color: var(--aviso); }
+  .mensagens .ok { color: var(--ok); }
+  .exportadas { display: flex; gap: 10px; padding: 8px 18px 12px; background: var(--painel); flex-wrap: wrap; }
+  .exportadas a img { height: 120px; border-radius: 6px; display: block; }
+  .exportadas:empty { display: none; }
+  .arte-controle + .arte-controle { margin-top: 6px; }
+  .sem-campos { color: var(--cinza); font-size: 13px; }
+  .abas { display: flex; gap: 0; margin: 4px 0 14px; border-bottom: 1px solid var(--linha); }
+  .abas button {
+    background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+    padding: 8px 16px; cursor: pointer; color: var(--cinza);
+    font: 700 13px "Cinzel", serif; letter-spacing: 1.5px; text-transform: uppercase;
+  }
+  .abas button.ativo { color: var(--prata-clara); border-bottom-color: var(--prata); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Criador de Cartas</h1>
+  <select id="abrir" title="Abrir uma carta de cards/"><option value="">Abrir carta…</option></select>
+  <select id="novo-tipo" title="Tipo da nova carta"></select>
+  <button class="botao" id="nova">Nova</button>
+  <span class="espaco"></span>
+  <span class="estado" id="estado">nova carta</span>
+  <button class="botao" id="salvar" title="Ctrl+S">Salvar</button>
+  <button class="botao principal" id="exportar">Exportar PNG</button>
+</header>
+
+<main>
+  <aside>
+    <div id="formulario"></div>
+    <details id="det-json">
+      <summary>JSON da carta</summary>
+      <textarea id="json" spellcheck="false"></textarea>
+      <div class="dica" id="json-erro"></div>
+    </details>
+  </aside>
+
+  <section class="previa">
+    <div class="palco" id="palco"><iframe id="quadro" title="Pré-visualização"></iframe></div>
+    <div class="barra-previa">
+      <span id="resumo">—</span>
+      <span class="espaco"></span>
+      <label class="check" style="margin:0"><input type="checkbox" id="exportar-pdf"> também PDF</label>
+    </div>
+    <div class="mensagens" id="mensagens"></div>
+    <div class="exportadas" id="exportadas"></div>
+  </section>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const estado = { cfg: null, carta: {}, arquivo: null, sujo: false, timer: null, pedido: 0, chaveForm: "" };
+const DICA_CHAVES = "Palavras-chave vão no texto (ex.: Escudo 2. Distante.); as que têm ícone aparecem sozinhas na carta.";
+const NOMES_TIPO = { acao: "Ação", personagem: "Personagem", item: "Item lendário", campo: "Campo de batalha",
+                     retiro: "Retiro", runa: "Runa", quest: "Quest" };
+
+async function api(caminho, corpo) {
+  const r = await fetch(caminho, corpo === undefined ? {} : {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.erro || r.statusText);
+  return d;
+}
+
+function normal(t) {
+  return String(t).normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+// ---------- caminhos dentro da carta ("frente.poder") ----------
+
+function ler(caminho) {
+  return caminho.split(".").reduce((o, k) => (o == null ? undefined : o[k]), estado.carta);
+}
+function gravar(caminho, valor) {
+  const partes = caminho.split(".");
+  let o = estado.carta;
+  partes.slice(0, -1).forEach((k, i) => { o = (o[k] ??= /^\d+$/.test(partes[i + 1]) ? [] : {}); });
+  const ultima = partes.at(-1);
+  if (Array.isArray(o)) o[+ultima] = valor ?? "";  // em lista, vazio vira "" para não abrir buraco
+  else if (valor === undefined || valor === "") delete o[ultima]; else o[ultima] = valor;
+}
+
+// ---------- controles do formulário ----------
+// Cada controle devolve um elemento e registra uma função que relê o valor da carta.
+
+let atualizadores = [];
+const aoAtualizar = f => atualizadores.push(f);
+const livre = (el, forcar) => forcar || document.activeElement !== el;
+
+function el(tag, attrs = {}, ...filhos) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v; else if (k.startsWith("on")) e[k] = v; else e.setAttribute(k, v);
+  }
+  for (const f of filhos) if (f != null) e.append(f);
+  return e;
+}
+const rotulo = (texto, dica) => el("label", {}, texto, dica ? el("span", { class: "dica" }, " " + dica) : null);
+
+function texto(campo, nome, { ph = "" } = {}) {
+  const i = el("input", { type: "text", placeholder: ph });
+  i.oninput = () => { gravar(campo, i.value); alterou(); };
+  aoAtualizar(f => { if (livre(i, f)) i.value = ler(campo) ?? ""; });
+  return el("div", {}, rotulo(nome), i);
+}
+
+function area(campo, nome, { dica = "", linhas = 3 } = {}) {
+  const i = el("textarea", { rows: linhas });
+  i.oninput = () => { gravar(campo, i.value); alterou(); };
+  aoAtualizar(f => { if (livre(i, f)) i.value = ler(campo) ?? ""; });
+  return el("div", {}, rotulo(nome), i, dica ? el("div", { class: "dica" }, dica) : null);
+}
+
+// vazio: o que gravar quando o campo fica em branco (undefined apaga a chave)
+function numero(campo, nome, { ph = "", vazio = undefined, min = 0 } = {}) {
+  const i = el("input", { type: "number", min, placeholder: ph });
+  i.oninput = () => { gravar(campo, i.value === "" ? vazio : (i.value === "X" ? "X" : +i.value)); alterou(); };
+  aoAtualizar(f => { if (livre(i, f)) i.value = ler(campo) ?? ""; });
+  return el("div", {}, rotulo(nome), i);
+}
+
+function check(campo, nome, { aoMudar } = {}) {
+  const i = el("input", { type: "checkbox" });
+  i.onchange = () => { aoMudar ? aoMudar(i.checked) : gravar(campo, i.checked || undefined); alterou(); };
+  aoAtualizar(() => { i.checked = !!ler(campo); });
+  return el("label", { class: "check" }, i, " " + nome);
+}
+
+function stepper(campo, nome) {
+  const i = el("input", { type: "number", min: 0 });
+  const mudar = v => { gravar(campo, Math.max(0, v)); alterou(); };
+  i.oninput = () => mudar(+i.value || 0);
+  aoAtualizar(f => { if (livre(i, f)) i.value = ler(campo) || 0; });
+  return el("div", {}, rotulo(nome),
+    el("div", { class: "stepper" },
+      el("button", { type: "button", onclick: () => mudar((ler(campo) || 0) - 1) }, "−"), i,
+      el("button", { type: "button", onclick: () => mudar((ler(campo) || 0) + 1) }, "+")));
+}
+
+function ato(campo, nome, { opcional = false } = {}) {
+  const opcoes = (opcional ? [["", "—"]] : []).concat([[1, "I"], [2, "II"], [3, "III"]]);
+  const caixa = el("div", { class: "segmentado" });
+  for (const [v, t] of opcoes) {
+    caixa.append(el("button", { type: "button", "data-v": v, onclick: () => { gravar(campo, v === "" ? undefined : v); alterou(); } }, t));
+  }
+  aoAtualizar(() => {
+    const atual = ler(campo) ?? (opcional ? "" : 1);
+    for (const b of caixa.children) b.classList.toggle("ativo", b.dataset.v == atual);
+  });
+  return el("div", {}, rotulo(nome), caixa);
+}
+
+function selecao(campo, nome, opcoes, { aoMudar } = {}) {
+  const s = el("select");
+  for (const [v, t] of opcoes) s.add(new Option(t, v));
+  s.onchange = () => { gravar(campo, s.value); if (aoMudar) aoMudar(s.value); alterou(); };
+  aoAtualizar(() => {
+    const atual = normal(ler(campo) ?? "");
+    const op = [...s.options].find(o => normal(o.value) === atual);
+    s.value = op ? op.value : "";
+  });
+  return el("div", {}, rotulo(nome), s);
+}
+
+// fichas clicáveis com ícone; max limita a quantidade; unico grava uma string em vez de lista
+function fichas(campo, nome, fonte, { max = Infinity, unico = false, dica = "" } = {}) {
+  const caixa = el("div", { class: "fichas" });
+  const atuais = () => { const v = ler(campo); return v == null || v === "" ? [] : [].concat(v); };
+  for (const it of estado.cfg[fonte]) {
+    const b = el("button", { type: "button", class: "ficha" + (fonte === "classes" ? " estandarte" : ""), "data-chave": it.chave },
+      it.icone ? el("img", { src: it.icone, alt: "" }) : null, el("span", {}, it.nome), el("span", { class: "ordem" }));
+    b.onclick = () => {
+      let lista = atuais().filter(x => normal(x) !== it.chave);
+      if (lista.length === atuais().length) {
+        if (unico) lista = [it.chave];
+        else if (lista.length >= max) return mensagem("aviso", `No máximo ${max} em "${nome}".`, true);
+        else lista.push(it.chave);
+      }
+      gravar(campo, unico ? lista[0] : lista);
+      alterou();
+    };
+    caixa.append(b);
+  }
+  aoAtualizar(() => {
+    const chaves = atuais().map(normal);
+    for (const b of caixa.children) {
+      const i = chaves.indexOf(b.dataset.chave);
+      b.classList.toggle("ativo", i >= 0);
+      b.querySelector(".ordem").textContent = i >= 0 && !unico ? i + 1 : "";
+    }
+  });
+  return el("div", {}, rotulo(nome, dica), caixa);
+}
+
+// opção de separar a dupla classe; só aparece com 2 classes
+function separarDupla(base = "") {
+  const i = el("input", { type: "checkbox" });
+  const lbl = el("label", { class: "check" }, i, " Mostrar as duas classes em estandartes separados");
+  i.onchange = () => { gravar(base + "classe_dupla", i.checked ? false : undefined); alterou(); };
+  aoAtualizar(() => {
+    lbl.hidden = [].concat(ler(base + "classes") || []).length !== 2;
+    i.checked = ler(base + "classe_dupla") === false;
+  });
+  return lbl;
+}
+
+
+// arte de um objeto (a carta, ou a frente/verso do personagem)
+function arte(base = "") {
+  const s = el("select", { class: "arte-controle" });
+  const encher = () => {
+    s.length = 0;
+    s.add(new Option("(sem arte)", ""));
+    for (const a of estado.cfg.artes) s.add(new Option(a, a));
+  };
+  encher();
+  s.onchange = () => { gravar(base + "arte", s.value || undefined); alterou(); };
+  const envio = el("input", { type: "file", accept: ".png,.jpg,.jpeg,.webp" });
+  envio.onchange = async () => {
+    const f = envio.files[0];
+    if (!f) return;
+    try {
+      const r = await fetch("/api/arte", { method: "POST", headers: { "X-Nome": encodeURIComponent(f.name) }, body: f });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.erro);
+      if (!estado.cfg.artes.includes(d.arte)) estado.cfg.artes.push(d.arte);
+      encher();
+      gravar(base + "arte", d.arte);
+      alterou();
+      mensagem("ok", `Arte salva em ${d.arte}.`, true);
+    } catch (err) { mensagem("erro", "Falha ao enviar a arte: " + err.message, true); }
+    envio.value = "";
+  };
+  const px = el("input", { type: "range", min: 0, max: 100 });
+  const py = el("input", { type: "range", min: 0, max: 100 });
+  const zm = el("input", { type: "range", min: 1, max: 2.5, step: 0.05 });
+  const vx = el("span", { class: "dica" }), vy = el("span", { class: "dica" }), vz = el("span", { class: "dica" });
+  const posicao = () => {
+    gravar(base + "arte_posicao", px.value == 50 && py.value == 40 ? undefined : `${px.value}% ${py.value}%`);
+    gravar(base + "arte_zoom", +zm.value === 1 ? undefined : +zm.value);
+    alterou();
+  };
+  px.oninput = py.oninput = zm.oninput = posicao;
+  aoAtualizar(() => {
+    const a = ler(base + "arte") || "";
+    if (a && ![...s.options].some(o => o.value === a)) s.add(new Option(a + " (não encontrada)", a));
+    s.value = a;
+    const [x, y] = (ler(base + "arte_posicao") || "50% 40%").split(/\s+/).map(parseFloat);
+    px.value = isNaN(x) ? 50 : x; py.value = isNaN(y) ? 40 : y;
+    zm.value = ler(base + "arte_zoom") || 1;
+    vx.textContent = px.value + "%"; vy.textContent = py.value + "%"; vz.textContent = (+zm.value).toFixed(2) + "×";
+  });
+  return el("div", {}, s, rotulo("Enviar imagem (salva em arte/)"), envio,
+    el("label", {}, "Posição horizontal ", vx), px,
+    el("label", {}, "Posição vertical ", vy), py,
+    el("label", {}, "Zoom ", vz), zm);
+}
+
+// abas: { chave: [título, [elementos]] }; a aba aberta é lembrada em estado.aba
+function abas(defs) {
+  const chaves = Object.keys(defs);
+  if (!chaves.includes(estado.aba)) estado.aba = chaves[0];
+  const barra = el("div", { class: "abas" });
+  const paineis = {};
+  const mostrar = k => {
+    estado.aba = k;
+    for (const b of barra.children) b.classList.toggle("ativo", b.dataset.aba === k);
+    for (const [c, pn] of Object.entries(paineis)) pn.hidden = c !== k;
+  };
+  for (const [k, [titulo, filhos]] of Object.entries(defs)) {
+    barra.append(el("button", { type: "button", "data-aba": k, onclick: () => mostrar(k) }, titulo));
+    paineis[k] = el("div", {}, ...filhos);
+  }
+  mostrar(estado.aba);
+  return [barra, ...Object.values(paineis)];
+}
+
+const linha = (...filhos) => el("div", { class: "linha", style: `grid-template-columns: repeat(${filhos.length}, 1fr)` }, ...filhos);
+const secao = (titulo, ...filhos) => el("fieldset", {}, el("legend", {}, titulo), ...filhos);
+
+// ---------- formulário de cada tipo ----------
+
+// ficha: null (o tipo não pode ser ficha) ou { rotulo, aoMudar }
+function secaoCarta(ficha = null) {
+  const estrelas = numero("estrelas", "Estrelas", { vazio: 0 });
+  aoAtualizar(() => { estrelas.hidden = !!ler("ficha"); });
+  return secao("Carta",
+    texto("nome", "Nome"),
+    linha(texto("numero", "Número", { ph: "001" }), estrelas),
+    ficha ? check("ficha", ficha.rotulo, { aoMudar: ficha.aoMudar }) : null,
+    ficha ? el("div", { class: "dica" }, "Fichas não têm estrelas (livro, seção 3).") : null);
+}
+const secaoTexto = (efeito = "Efeito", extra = null) => secao("Texto",
+  area("texto", efeito, { dica: "**negrito**, *itálico*; cada linha vira um parágrafo.", linhas: 5 }),
+  extra || area("ambientacao", "Ambientação", { linhas: 2 }));
+const classes = (base = "") => [fichas(base + "classes", "Classes", "classes", { dica: "(a 1ª fica à esquerda no estandarte duplo)" }), separarDupla(base)];
+
+const FORMULARIOS = {
+  acao: () => [
+    secaoCarta(),
+    secao("Ação",
+      ato("ato_minimo", "Ato mínimo"),
+      fichas("elementos", "Elementos", "elementos", { max: 3, dica: "(até 3, na ordem do círculo e das cores)" }),
+      stepper("custo_carga", "Custo de carga"),
+      ...classes(),
+      fichas("subtipos", "Subtipos", "subtipos")),
+    secaoTexto(),
+    secao("Arte", arte()),
+  ],
+
+  personagem: () => {
+    const fichaOpcao = { rotulo: "Aliado comum (ficha): uma face, sem elemento, nível nem enredo", aoMudar: virarAliadoComum };
+    if (estado.carta.ficha) {
+      return [secaoCarta(fichaOpcao),
+        secao("Aliado comum",
+          ...classes(),
+          linha(texto("raca", "Raça"), texto("cla", "Clã"), texto("funcao", "Função")),
+          linha(numero("poder", "Poder"), el("div"))),
+        secaoTexto(), secao("Arte", arte())];
+    }
+    return [secaoCarta(fichaOpcao),
+      secao("Personagem",
+        fichas("elemento", "Elemento", "elementos", { unico: true, dica: "(1; gera a runa dele e define a cor)" }),
+        ...classes(),
+        linha(texto("raca", "Raça"), texto("cla", "Clã"), texto("funcao", "Função"))),
+      ...abas({
+        frente: ["Frente", [
+          secao("Forma base",
+            linha(numero("frente.poder", "Poder"), el("div")),
+            area("frente.texto", "Efeito", { linhas: 4, dica: DICA_CHAVES })),
+          secao("Evolução",
+            linha(numero("frente.evolui_nivel", "Nível mínimo", { ph: "no triângulo" }), el("div")),
+            area("frente.evolui", "Condição para evoluir", { linhas: 2 })),
+          secao("Arte da frente", arte("frente."))]],
+        verso: ["Verso", [
+          secao("Forma evoluída",
+            texto("verso.nome", "Nome"),
+            linha(numero("verso.poder", "Poder"), el("div")),
+            area("verso.texto", "Efeito", { linhas: 4, dica: DICA_CHAVES })),
+          secao("Ascensão",
+            linha(numero("verso.ascensao_nivel", "Nível mínimo", { ph: "6 a 11" }), el("div")),
+            area("verso.ascende", "Condição para ascender", { linhas: 2 })),
+          secao("Arte do verso", arte("verso."))]],
+      }),
+    ];
+  },
+
+  item: () => [
+    secaoCarta({ rotulo: "Item comum (ficha)" }),
+    secao(estado.carta.ficha ? "Item comum" : "Item lendário",
+      ato("ato_minimo", "Ato mínimo", { opcional: true }),
+      selecao("slot", "Slot", estado.cfg.slots.map(s => [s.nome, s.nome])),
+      linha(numero("custo_moedas", "Custo em moedas", { ph: "sem custo" }), el("div")),
+      el("div", { class: "dica" }, "Opcional. É o preço para trazer o item com Abra o mercado; itens também entram por outros efeitos.")),
+    secaoTexto(),
+    secao("Arte", arte()),
+  ],
+
+  local: () => [
+    secaoCarta(),
+    secao(NOMES_TIPO[estado.carta.tipo] || "Local",
+      selecao("tipo", "Tipo", [["campo", "Campo de batalha"], ["retiro", "Retiro"], ["runa", "Runa"]], { aoMudar: ajustarRuna }),
+      fichas("elemento", "Elemento", "elementos", { unico: true, dica: "(obrigatório; a runa que a carta fornece)" }),
+      ato("ato_minimo", "Ato mínimo", { opcional: true }),
+      check("avancado", "Avançado (entra por cima de um básico seu)", { aoMudar: v => { gravar("avancado", v || undefined); ajustarRuna(); } }),
+      estado.carta.tipo === "runa" ? el("div", { class: "dica" }, "Runa básica é sempre ficha, gerada na preparação; só a avançada vem do deck de Eventos (livro, seção 6). A básica é só nome, elemento e arte; a avançada ganha a moldura rúnica e a caixa de texto.") : null),
+    ...(estado.carta.tipo === "runa" && !estado.carta.avancado ? [] : [secaoTexto()]),
+    secao("Arte", arte()),
+  ],
+
+  quest: () => [
+    secaoCarta(),
+    el("div", { class: "dica", style: "margin: -8px 0 14px" },
+      "A pilha de quests é embaralhada: a mesma quest pode sair em qualquer ato. Escreva a condição de cada um (fica mais difícil a cada ato)."),
+    secao("Atos",
+      area("atos.0", "Ato I", { linhas: 3 }),
+      area("atos.1", "Ato II", { linhas: 3 }),
+      area("atos.2", "Ato III", { linhas: 3, dica: "**negrito**, *itálico*; cada linha vira um parágrafo." })),
+    secao("Recompensa adicional",
+      area("recompensa", "Recompensa (opcional)", { linhas: 2, dica: "Se houver, os atos encolhem e a caixa da recompensa aparece embaixo." })),
+    secao("Arte", arte()),
+  ],
+};
+const grupo = tipo => ["campo", "retiro", "runa"].includes(tipo) ? "local" : tipo;
+
+// personagem único (duas faces) <-> aliado comum (ficha, uma face, sem elemento/enredo/estrelas)
+const CAMPOS_FACE = ["poder", "texto", "arte", "arte_posicao", "arte_zoom"];
+function virarAliadoComum(ligar) {
+  const c = estado.carta;
+  if (ligar) {
+    for (const k of CAMPOS_FACE) if (c.frente && k in c.frente) c[k] = c.frente[k];
+    for (const k of ["frente", "verso", "elemento", "enredo", "estrelas"]) delete c[k];
+    c.ficha = true;
+  } else {
+    c.frente = {};
+    for (const k of CAMPOS_FACE) if (k in c) { c.frente[k] = c[k]; delete c[k]; }
+    c.frente.poder ??= 0;
+    c.frente.evolui_nivel ??= 3;
+    c.frente.evolui ??= "";
+    c.verso = { nome: c.nome || "", poder: c.frente.poder, ascensao_nivel: 8, texto: "", ascende: "" };
+    c.estrelas = 0;
+    delete c.ficha;
+  }
+}
+
+// runa: básica é ficha, avançada não; campo e retiro nunca são ficha
+function ajustarRuna() {
+  const c = estado.carta;
+  if (c.tipo === "runa" && !c.avancado) { c.ficha = true; delete c.estrelas; }
+  else { delete c.ficha; c.estrelas ??= 0; }
+}
+
+function montarFormulario() {
+  const tipo = grupo(estado.carta.tipo);
+  const chave = [tipo, estado.carta.tipo, !!estado.carta.ficha].join(":");
+  if (chave === estado.chaveForm) return;
+  estado.chaveForm = chave;
+  atualizadores = [];
+  const f = $("#formulario");
+  f.innerHTML = "";
+  const montar = FORMULARIOS[tipo];
+  if (!montar) {
+    f.append(el("p", { class: "sem-campos" }, `Tipo "${estado.carta.tipo}" sem formulário: edite pelo JSON abaixo.`));
+    $("#det-json").open = true;
+    return;
+  }
+  f.append(...montar());
+  preencher(true);
+}
+
+function preencher(forcar = false) {
+  montarFormulario();
+  for (const a of atualizadores) a(forcar);
+  const j = $("#json");
+  if (livre(j, forcar)) {
+    j.value = JSON.stringify(estado.carta, null, 2);
+    j.classList.remove("invalido");
+    $("#json-erro").textContent = "";
+  }
+}
+
+function alterou() {
+  estado.sujo = true;
+  atualizarEstado();
+  preencher();
+  clearTimeout(estado.timer);
+  estado.timer = setTimeout(previa, 180);
+}
+
+function atualizarEstado() {
+  const e = $("#estado");
+  e.textContent = (estado.arquivo ? "cards/" + estado.arquivo : "nova carta") + (estado.sujo ? " · não salvo" : " · salvo");
+  e.classList.toggle("sujo", estado.sujo);
+}
+
+$("#json").addEventListener("input", e => {
+  try {
+    const d = JSON.parse(e.target.value);
+    if (typeof d !== "object" || Array.isArray(d) || d === null) throw new Error("precisa ser um objeto");
+    estado.carta = d;
+    e.target.classList.remove("invalido");
+    $("#json-erro").textContent = "";
+    alterou();
+  } catch (err) {
+    e.target.classList.add("invalido");
+    $("#json-erro").textContent = "JSON inválido: " + err.message;
+  }
+});
+
+// ---------- pré-visualização ----------
+
+async function previa() {
+  const n = ++estado.pedido;
+  let r;
+  try { r = await api("/api/previa", { carta: estado.carta, arquivo: estado.arquivo }); }
+  catch (err) { return mostrarMensagens([["erro", "Servidor: " + err.message]]); }
+  if (n !== estado.pedido) return;  // chegou uma resposta mais nova
+  const msgs = r.erros.map(m => ["erro", m]).concat(r.avisos.map(m => ["aviso", m]));
+  if (r.html) {
+    const q = $("#quadro");
+    q.onload = () => esperarAjuste(q, n, msgs);
+    q.srcdoc = r.html;
+    q.style.width = (630 * r.faces + 30 * (r.faces - 1)) + "px";
+    q.style.height = (r.legendas ? 912 : 880) + "px";
+    escalar();
+  }
+  mostrarMensagens(msgs);
+  $("#resumo").textContent = r.erros.length ? `${r.erros.length} erro(s): a carta não seria gerada` :
+    `${r.faces} face(s) · 63 × 88 mm`;
+}
+
+function esperarAjuste(q, n, msgs) {
+  const w = q.contentWindow;
+  const tentar = () => {
+    if (n !== estado.pedido) return;
+    if (w.document.body && w.document.body.dataset.pronto === "1") {
+      const extras = (w.__avisos || []).map(([_, m]) => ["aviso", "Ajuste: " + m]);
+      if (extras.length) mostrarMensagens(msgs.concat(extras));
+    } else setTimeout(tentar, 60);
+  };
+  tentar();
+}
+
+function escalar() {
+  const q = $("#quadro"), p = $("#palco");
+  const w = parseFloat(q.style.width) || 630, h = parseFloat(q.style.height) || 880;
+  const s = Math.min((p.clientWidth - 40) / w, (p.clientHeight - 40) / h, 1.2);
+  q.style.transform = `scale(${s})`;
+  q.style.margin = `${-(h * (1 - s)) / 2}px ${-(w * (1 - s)) / 2}px`;
+}
+new ResizeObserver(escalar).observe($("#palco"));
+
+let fixas = [];
+function mostrarMensagens(msgs) {
+  const caixa = $("#mensagens");
+  caixa.innerHTML = "";
+  for (const [tipo, texto] of fixas.concat(msgs)) {
+    const d = document.createElement("div");
+    d.className = tipo;
+    d.textContent = (tipo === "erro" ? "Erro: " : tipo === "aviso" ? "Aviso: " : "") + texto;
+    caixa.appendChild(d);
+  }
+}
+function mensagem(tipo, texto, temporaria) {
+  fixas = [[tipo, texto]];
+  mostrarMensagens([]);
+  if (temporaria) setTimeout(() => { fixas = []; previa(); }, 4000);
+}
+
+// ---------- abrir, nova, salvar, exportar ----------
+
+async function carregarLista() {
+  const lista = await api("/api/cartas");
+  const s = $("#abrir");
+  s.length = 1;
+  for (const c of lista) s.add(new Option(`${c.nome || c.arquivo}  ·  ${NOMES_TIPO[c.tipo] || c.tipo}`, c.arquivo));
+  s.value = estado.arquivo || "";
+}
+
+function carregar(carta, arquivo, sujo) {
+  estado.carta = carta;
+  estado.arquivo = arquivo;
+  estado.sujo = sujo;
+  $("#abrir").value = arquivo || "";
+  $("#exportadas").innerHTML = "";
+  preencher(true); atualizarEstado(); previa();
+}
+
+$("#abrir").onchange = async e => {
+  if (!e.target.value) return;
+  if (estado.sujo && !confirm("Descartar as alterações não salvas?")) { e.target.value = estado.arquivo || ""; return; }
+  carregar(await api("/api/carta?arquivo=" + encodeURIComponent(e.target.value)), e.target.value, false);
+};
+
+$("#nova").onclick = () => {
+  if (estado.sujo && !confirm("Descartar as alterações não salvas?")) return;
+  novaCarta($("#novo-tipo").value);
+};
+function novaCarta(tipo, sujo = true) {
+  const c = structuredClone(estado.cfg.modelos[tipo]);
+  c.nome = "Nova carta";
+  for (const o of [c, c.frente, c.verso]) if (o) delete o.arte;
+  if (c.verso) c.verso.nome = "Nova carta evoluída";
+  carregar(c, null, sujo);
+}
+
+async function salvar() {
+  try {
+    const r = await api("/api/salvar", { carta: estado.carta, arquivo: estado.arquivo });
+    estado.arquivo = r.arquivo;
+    estado.sujo = false;
+    atualizarEstado();
+    await carregarLista();
+    return true;
+  } catch (err) { mensagem("erro", "Falha ao salvar: " + err.message); return false; }
+}
+$("#salvar").onclick = salvar;
+addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); salvar(); } });
+
+$("#exportar").onclick = async () => {
+  const b = $("#exportar");
+  if ((estado.sujo || !estado.arquivo) && !(await salvar())) return;
+  b.disabled = true; b.textContent = "Exportando…";
+  try {
+    const r = await api("/api/exportar", { arquivo: estado.arquivo, pdf: $("#exportar-pdf").checked });
+    $("#exportadas").innerHTML = r.pngs.map(u => `<a href="${u}?t=${Date.now()}" target="_blank" title="Abrir PNG"><img src="${u}?t=${Date.now()}" alt=""></a>`).join("");
+    fixas = [];
+    mostrarMensagens(r.saida.split("\n").filter(Boolean).map(l => [r.ok ? (/ERRO/.test(l) ? "erro" : /aviso/.test(l) ? "aviso" : "ok") : "erro", l.trim()]));
+  } catch (err) { mensagem("erro", "Falha ao exportar: " + err.message); }
+  b.disabled = false; b.textContent = "Exportar PNG";
+};
+
+addEventListener("beforeunload", e => { if (estado.sujo) { e.preventDefault(); e.returnValue = ""; } });
+
+// ---------- início ----------
+
+(async () => {
+  estado.cfg = await api("/api/config");
+  for (const t of estado.cfg.tipos) $("#novo-tipo").add(new Option(NOMES_TIPO[t] || t, t));
+  await carregarLista();
+  novaCarta("acao", false);
+})();
+</script>
+</body>
+</html>

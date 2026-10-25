@@ -1,0 +1,13 @@
+{
+  "tipo": "acao",
+  "nome": "Contramagia das Três Marés",
+  "numero": "002",
+  "estrelas": 5,
+  "ato_minimo": 3,
+  "elementos": ["mana", "divino", "alma"],
+  "custo_carga": 3,
+  "classes": ["mago", "ladino"],
+  "subtipos": ["reação", "leve"],
+  "texto": "Anule o item do topo da pilha. Se ele era uma evolução ou ascensão, o personagem não pode tentar de novo (livro, seção 7).\nO executor fica exaurido até o fim do seu próximo Hiato.",
+  "ambientacao": "A maré sobe três vezes e leva tudo consigo."
+}
