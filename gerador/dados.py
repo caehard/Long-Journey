@@ -9,7 +9,7 @@ import re
 import unicodedata
 from pathlib import Path
 
-from .simbolos import PANO_ESTREITO, PANO_LARGO, anexo_icone, anexo_moedas, bandeira, bandeira_personagem, interno_slot, circulo_elementos, estrela_lapidada, linha_moldura, simbolo_quina, circulo_local, circulo_runa_avancada, hexagono_poder, medalhao_slot, moeda_custo, circulo_texto, estandarte, estandarte_duplo, selo_chave, tema
+from .simbolos import PANO_ESTREITO, PANO_LARGO, anexo_icone, medalhao_solto, anexo_moedas, bandeira, bandeira_personagem, interno_slot, circulo_elementos, estrela_lapidada, linha_moldura, simbolo_quina, circulo_local, circulo_runa_avancada, hexagono_poder, medalhao_slot, moeda_custo, circulo_texto, estandarte, estandarte_duplo, selo_chave, tema
 
 RAIZ = Path(__file__).resolve().parent.parent
 FRAMES = RAIZ / "frames"
@@ -227,6 +227,8 @@ POSICOES_CHAVES = [(0, 0), (52.2, 0), (26.1, 45.4), (78.3, 45.4), (52.2, 90.8)]
 PJ_NOME_TOPO, PJ_NOME_ALTURA = 505, 54       # barra do nome
 PJ_PANO_DIREITA = 36                         # estandarte: distância da borda direita
 PJ_NOME_TOPO_QUEST = 385                     # na quest o nome sobe para os atos caberem
+PJ_NOME_TOPO_RUNA = 58                       # na runa o nome fica no alto
+PJ_RUNA_BASE, PJ_RUNA_VAO = 716, 84          # runa: linha de baixo mais alta, aberta em volta do elemento
 PJ_CAIXA_ESQ, PJ_CAIXA_TOPO = 234, 700       # caixa de evolução/ascensão (canto de baixo à esquerda)
 PJ_CAIXA_INCL, PJ_CAIXA_ALTURA = 60, 180     # borda esquerda inclinada: 60 px mais para dentro no topo
 
@@ -265,6 +267,9 @@ def _cortes_moldura(c):
     do nome nem da caixa de evolução: ela é interrompida nesses lugares (não é só escondida),
     para nada aparecer atrás do que é transparente."""
     e, d, t, b = 22.5, 630 - 22.5, 22.5, 880 - 96 - 2.5   # centro da linha
+    runa = c.get("runa_medalhao")
+    if runa:
+        b = PJ_RUNA_BASE
     pano = c.get("pano_largura")
     pano1 = 630 - PJ_PANO_DIREITA
     # a base para na borda inclinada da caixa, na altura da linha
@@ -273,7 +278,12 @@ def _cortes_moldura(c):
     # volta completa a partir do nome, descendo pela esquerda; QUEBRA = trecho interrompido
     nome_topo = c.get("nome_topo", PJ_NOME_TOPO)
     volta = [(e, nome_topo + PJ_NOME_ALTURA, False), (e, b, True)]
-    volta += [(caixa_x, b, False), QUEBRA, (d, PJ_CAIXA_TOPO, False)] if c.get("criterio_rotulo") else [(d, b, True)]
+    if c.get("criterio_rotulo"):
+        volta += [(caixa_x, b, False), QUEBRA, (d, PJ_CAIXA_TOPO, False)]
+    elif runa:
+        volta += [(315 - PJ_RUNA_VAO, b, False), QUEBRA, (315 + PJ_RUNA_VAO, b, False), (d, b, True)]
+    else:
+        volta += [(d, b, True)]
     volta += [(d, t, True)]
     if pano:
         volta += [(pano1, t, False), QUEBRA, (pano1 - pano, t, False)]
@@ -401,11 +411,13 @@ def _personagem(d, cfg, val, origem):
     return faces
 
 
-def _pano(c, linhas, centro=None, anexo=None, classes=(), avancado=False, detalhe=True):
+def _pano(c, linhas, centro=None, anexo=None, classes=(), avancado=False, detalhe=True,
+          segundo=None, segundo_avancado=False, nome_segundo=""):
     """Layout novo (frames/carta.html): texto vertical do canto de cima à esquerda e estandarte."""
     c["linhas_raca"] = [x for x in linhas if x]
-    nomes = [e["nome"] for e in c.get("elementos_s", [])] + [s["nome"] for s in classes]
-    c["bandeira"] = bandeira(c["tema"]["a"], centro, anexo, classes, avancado, detalhe, " · ".join(nomes))
+    nomes = [e["nome"] for e in c.get("elementos_s", [])] + [s["nome"] for s in classes] + ([nome_segundo] if nome_segundo else [])
+    c["bandeira"] = bandeira(c["tema"]["a"], centro, anexo, classes, avancado, detalhe, " · ".join(nomes),
+                             segundo, segundo_avancado)
     c["pano_largura"] = (PANO_LARGO if centro else PANO_ESTREITO) if c["bandeira"] else None
 
 
@@ -413,7 +425,8 @@ def _layout(c):
     """Completa o que o frame comum (carta.html) usa e cada tipo não preencheu."""
     for k, v in (("linhas_raca", []), ("bandeira", None), ("pano_largura", None), ("poder_svg", None),
                  ("chaves_pos", []), ("criterio_rotulo", None), ("quina_svg", None), ("atos", None),
-                 ("recompensa", ""), ("lado", ""), ("sem_texto", False), ("ato_minimo", None)):
+                 ("recompensa", ""), ("lado", ""), ("sem_texto", False), ("ato_minimo", None),
+                 ("runa_medalhao", None)):
         c.setdefault(k, v)
     # só o personagem único tem a estrela embaixo à esquerda; nos outros ela fica no centro
     c["base_centro"] = not (c["tipo"] == "personagem" and not c["ficha"])
@@ -470,14 +483,21 @@ def _local(d, cfg, val, origem):
             val.aviso("runa básica não tem caixa de texto: texto e ambientação não aparecem")
         if not c["avancado"]:
             c["sem_texto"] = True
-        _pano(c, ["Runa", "Avançada" if c["avancado"] else "Básica"],
-              circulo_elementos(elementos), avancado=c["avancado"])
+        # sem estandarte e sem texto vertical: o nome sobe e o elemento desce para o centro de
+        # baixo, sobre a linha da moldura; a estrela rúnica em volta é o que diz "avançada"
+        c["nome_topo"] = PJ_NOME_TOPO_RUNA
+        c["runa_base"] = PJ_RUNA_BASE
+        c["runa_medalhao"] = medalhao_solto(
+            circulo_elementos(elementos), c["tema"]["a"], c["avancado"],
+            " · ".join([e["nome"] for e in elementos] + (["runa avançada"] if c["avancado"] else ["runa básica"])))
         return [("runa", c, "")]
-    # estandarte: o elemento no medalhão (avançado, com a estrela rúnica), o ícone do tipo preso a ele
+    # estandarte: o elemento no medalhão e, embaixo, separado e do mesmo tamanho, o ícone do tipo
+    # (com a estrela rúnica se for avançado)
     icone = dict(simbolo(cfg, "locais", d["tipo"]), nome=NOMES_LOCAL[d["tipo"]])
     c["icone_local"] = circulo_local(icone, c["tema"]["a"], c["avancado"])
     _pano(c, [NOMES_LOCAL[d["tipo"]], "Avançado" if c["avancado"] else "Básico"],
-          circulo_elementos(elementos), anexo_icone(icone), avancado=c["avancado"])
+          circulo_elementos(elementos), segundo=interno_slot(icone, c["tema"]["a"]),
+          segundo_avancado=c["avancado"], nome_segundo=icone["nome"] + (" avançado" if c["avancado"] else ""))
     return [("local", c, "")]
 
 

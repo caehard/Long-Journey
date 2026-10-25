@@ -521,9 +521,13 @@ def interno_slot(s, cor):
             f'<circle cx="50" cy="50" r="{R_ANEL}" fill="none" stroke="{cor}" stroke-width="{TRACO_ANEL}"/>{glifo}')
 
 
-def bandeira(cor, centro=None, anexo=None, classes=(), avancado=False, detalhe=True, titulo=""):
+def bandeira(cor, centro=None, anexo=None, classes=(), avancado=False, detalhe=True, titulo="",
+             segundo=None, segundo_avancado=False):
     """SVG do estandarte (Markup), ou None se não houver nada para pendurar nele.
-    centro: SVG de 100 x 100 do medalhão; anexo: SVG de 100 x 100 do círculo preso a ele."""
+    centro: SVG de 100 x 100 do medalhão; anexo: SVG de 100 x 100 do círculo preso a ele;
+    segundo: SVG de 100 x 100 de um segundo medalhão, do mesmo tamanho, separado embaixo do
+    primeiro (campo/retiro: o ícone do tipo, menos importante que o elemento; segundo_avancado
+    põe nele a estrela rúnica)."""
     partes = []
     if centro:
         largura = PANO_LARGO
@@ -532,6 +536,11 @@ def bandeira(cor, centro=None, anexo=None, classes=(), avancado=False, detalhe=T
             partes.append(_anexo(anexo, cor, cx, cy))
         partes.append(_medalhao(centro, cor, cx, cy, avancado, detalhe))
         fim = 266 if classes else 196   # onde as laterais do pano terminam e começa a ponta
+        if segundo:
+            r1, r2 = (74 if avancado else 62), (74 if segundo_avancado else 62)
+            cy2 = cy + r1 + 20 + r2
+            partes.append(_medalhao(segundo, cor, cx, cy2, segundo_avancado, detalhe))
+            fim = cy2 + r2 + 18
         if classes:
             partes.append(_classes_no_pano(classes, cor, cx, 222, 1.4))
     elif classes:  # sem medalhão (aliado comum): estandarte estreito, classes empilhadas
@@ -551,6 +560,15 @@ def bandeira(cor, centro=None, anexo=None, classes=(), avancado=False, detalhe=T
         f'<svg class="pj-bandeira" viewBox="0 0 {largura} {_f(ponta)}" width="{largura}" height="{_f(ponta)}" '
         f'role="img" aria-label="{titulo}"><title>{titulo}</title>'
         f'<path class="pano" d="{pano}" stroke="{cor}"/>{"".join(partes)}</svg>')
+
+
+def medalhao_solto(interno, cor, avancado, titulo=""):
+    """O medalhão do estandarte sozinho (runa: o elemento, embaixo no centro da carta);
+    avançado com a estrela rúnica em volta, que é o que diz que a runa é avançada."""
+    return Markup(
+        f'<svg class="pj-bandeira pj-medalhao-solto" viewBox="0 0 160 160" width="160" height="160" '
+        f'role="img" aria-label="{titulo}"><title>{titulo}</title>'
+        f'{_medalhao(interno, cor, 80, 80, avancado, True)}</svg>')
 
 
 def bandeira_personagem(elementos, classes, unico, cor):

@@ -33,6 +33,8 @@
     {% endif %}
 
     {% if c.bandeira %}<div class="pj-pano">{{ c.bandeira }}</div>{% endif %}
+    {# runa: o elemento embaixo, no centro, sobre a linha da moldura (aberta em volta dele) #}
+    {% if c.runa_medalhao %}<div class="pj-runa" style="top: {{ c.runa_base }}px">{{ c.runa_medalhao }}</div>{% endif %}
 
     <div class="pj-nome-linha"{% if c.nome_topo is defined %} style="top: {{ c.nome_topo - 15 }}px"{% endif %}>
       <div class="pj-barra-nome"><div class="nome ajustar-largura">{{ c.nome }}</div></div>

@@ -166,6 +166,12 @@
 .pj-base-centro .pj-rodape > span:first-child { grid-column: 1; justify-self: start; }
 .pj-base-centro .pj-rodape > span:last-child { grid-column: 3; justify-self: end; }
 
+/* ---------- runa: elemento embaixo, no centro, sobre a linha da moldura ---------- */
+.pj-runa { position: absolute; left: 50%; transform: translate(-50%, -50%); width: 160px; height: 160px; z-index: 3; }
+.pj-runa .pj-medalhao-solto { width: 160px; height: 160px; }
+/* runa avançada: o texto fica entre a arte e o elemento */
+.pj.tipo-runa .pj-texto { top: 486px; bottom: 252px; }
+
 /* ---------- estandarte avançado: estrela rúnica no lugar do anel ---------- */
 .pj-bandeira .pano-estrela { stroke-width: 3; stroke-linejoin: round; }
 .pj-bandeira .pano-estrela-filete { fill: none; stroke-width: 1; stroke-linejoin: round; opacity: 0.5; }
