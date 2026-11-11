@@ -280,7 +280,8 @@ def _cortes_moldura(c):
         # runa, campo, retiro: nome centralizado sobre a linha de cima, base alta com os medalhões;
         # a linha termina um pouco por dentro do contorno de cada medalhão (entra por baixo do anel)
         b = PJ_RUNA_BASE
-        n0, n1 = 315 - PJ_NOME_CENTRO_LARG / 2 - 6, 315 + PJ_NOME_CENTRO_LARG / 2 + 6
+        folga = 18 if c.get("ato_minimo") else 6   # a placa do ato é 12 px mais larga de cada lado
+        n0, n1 = 315 - PJ_NOME_CENTRO_LARG / 2 - folga, 315 + PJ_NOME_CENTRO_LARG / 2 + folga
         volta = [(n1, t, False), (d, t, True)]
         raio = lambda avancado: PJ_MED_RAIO[avancado] - PJ_MED_ENCAIXE
         if c.get("quinas"):

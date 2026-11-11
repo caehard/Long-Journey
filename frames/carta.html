@@ -53,11 +53,13 @@
 
     {# runa, campo, retiro: a placa do nome desce em ponta, com o ato mínimo dentro #}
     {% if c.ato_minimo and c.nome_centro %}
-    <div class="pj-ato-abaixo" style="top: {{ c.nome_topo + 51 }}px">
-      <svg class="ato-ponta" viewBox="0 0 330 50" role="img" aria-label="ato mínimo {{ c.ato_minimo }}">
-        <polygon class="fundo" points="0,0 330,0 330,18 165,48 0,18"/>
-        <path class="borda" d="M1.5 0 V18 L165 48 L328.5 18 V0"/>
-        <text x="165" y="22">{{ c.ato_minimo|romano }}</text>
+    <div class="pj-ato-abaixo" style="top: {{ c.nome_topo }}px">
+      {# placa mais larga que a barra, por trás dela: os lados (com chanfro em cima) a abraçam e
+         descem até a ponta, onde fica o ato #}
+      <svg class="ato-ponta" viewBox="0 0 354 100" role="img" aria-label="ato mínimo {{ c.ato_minimo }}">
+        <polygon class="fundo" points="12,0 342,0 352,14 352,68 177,98 2,68 2,14"/>
+        <path class="borda" d="M12 1.5 L2 14 V68 L177 98 L352 68 V14 L342 1.5"/>
+        <text x="177" y="74">{{ c.ato_minimo|romano }}</text>
       </svg>
     </div>
     {% endif %}

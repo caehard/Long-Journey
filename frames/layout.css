@@ -174,9 +174,9 @@
 /* a base da moldura desceu: a estrela desce junto para não encostar no medalhão do centro */
 .pj.tipo-runa .pj-base, .pj.tipo-campo .pj-base, .pj.tipo-retiro .pj-base { bottom: 8px; }
 
-/* ato mínimo: a placa do nome centralizado desce em ponta (mesma largura), com o ato dentro */
-.pj-ato-abaixo { position: absolute; left: 50%; transform: translateX(-50%); width: 330px; height: 50px; z-index: 2; }
-.pj-ato-abaixo .ato-ponta { display: block; width: 330px; height: 50px; overflow: visible;
+/* ato mínimo: placa por trás do nome centralizado, mais larga que ele (os lados vêm de fora da barra) e descendo em ponta, com o ato dentro */
+.pj-ato-abaixo { position: absolute; left: 50%; transform: translateX(-50%); width: 354px; height: 100px; z-index: 2; }
+.pj-ato-abaixo .ato-ponta { display: block; width: 354px; height: 100px; overflow: visible;
   filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5)); }
 .pj-ato-abaixo .fundo { fill: var(--painel); }
 .pj-ato-abaixo .borda { fill: none; stroke: var(--prata); stroke-width: 3; stroke-linejoin: miter; }
