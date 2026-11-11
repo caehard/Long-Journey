@@ -174,11 +174,14 @@
 /* a base da moldura desceu: a estrela desce junto para não encostar no medalhão do centro */
 .pj.tipo-runa .pj-base, .pj.tipo-campo .pj-base, .pj.tipo-retiro .pj-base { bottom: 8px; }
 
-/* ato mínimo pendurado embaixo do nome centralizado, com a ponta para baixo */
-.pj-ato-abaixo { position: absolute; left: 50%; transform: translateX(-50%); z-index: 3; }
-.pj .pj-ato-abaixo .ato-pent { position: static; transform: none; display: block; width: 58px; height: 68px;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.55)); }
-.pj .pj-ato-abaixo .ato-pent text { font-size: 26px; }
+/* ato mínimo: a placa do nome centralizado desce em ponta (mesma largura), com o ato dentro */
+.pj-ato-abaixo { position: absolute; left: 50%; transform: translateX(-50%); width: 330px; height: 50px; z-index: 2; }
+.pj-ato-abaixo .ato-ponta { display: block; width: 330px; height: 50px; overflow: visible;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5)); }
+.pj-ato-abaixo .fundo { fill: var(--painel); }
+.pj-ato-abaixo .borda { fill: none; stroke: var(--prata); stroke-width: 3; stroke-linejoin: miter; }
+.pj-ato-abaixo text { font-family: "Cinzel", serif; font-weight: 700; font-size: 22px;
+  fill: var(--creme); text-anchor: middle; dominant-baseline: central; }
 
 /* runa, campo e retiro: nome centralizado sobre a linha de cima (dados.PJ_NOME_CENTRO_*) */
 .pj-nome-linha.centro { left: 50%; transform: translateX(-50%); }

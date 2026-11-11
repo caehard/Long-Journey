@@ -352,7 +352,7 @@ def _acao(d, cfg, val, origem):
     _com_elementos(c, _elementos(d, cfg, val, "elementos", 3))
     # estandarte: elementos (com o custo de carga por cima) e a classe embaixo; o ato mínimo
     # fica no pentágono colado ao nome (carta.html)
-    _pano(c, ["Ação", " · ".join(x["nome"] for x in c["subtipos_s"])],
+    _pano(c, [" · ".join(x["nome"] for x in c["subtipos_s"])],
           c["circulo"], None, c["classes_s"])
     return [("acao", c, "")]
 
