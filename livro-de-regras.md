@@ -1,6 +1,6 @@
 # Livro de Regras (rascunho v0.5)
 
-Atualizado em 22 de outubro de 2026.
+Atualizado em 11 de novembro de 2026.
 
 ## 1. Visão geral
 
@@ -25,7 +25,7 @@ Os valores fixos do jogo ficam nesta tabela. Cada um é detalhado na seção ind
 | Ações de carta por turno | No máximo 1 por runa (3) | 6 |
 | Quests na pilha | 2 por jogador, sorteadas | 4, 11 |
 | Níveis de uma quest | Igual ao número do ato (1, 2 ou 3) | 11 |
-| Níveis por eliminação | +2 | 11 |
+| Níveis por morte de um jogador | 2, divididos entre os vivos da facção rival (nenhum com 3 ou mais) | 9, 11 |
 | Nível inicial | 0 | 11 |
 | Nível mínimo de ascensão | Varia por personagem, de 6 a 11 | 12 |
 | Atos | 3 (não há ato 4) | 11 |
@@ -241,8 +241,19 @@ Se um personagem muda de alinhamento, o alinhamento de seus aliados e fichas mud
 
 - Cura: só personagens **comuns**, e só se estiverem no retiro durante o Hiato.
 - Um personagem principal morto não joga mais, mas seus níveis continuam contando.
-- Quem mata um jogador ganha **2 níveis**. Os níveis vão ao dono da unidade que deu o golpe final.
+- Quando um personagem principal morre, a **facção rival** recebe **2 níveis**, divididos igualmente entre os membros dela (ver **Níveis por morte** abaixo). Não importa quem deu o golpe final.
 - Ao morrer, um personagem leva seus itens equipados ao descarte.
+
+**Níveis por morte**
+
+- Facção é o grupo de jogadores com o mesmo alinhamento. A facção rival de um personagem **bom** é a dos **maus**, e a de um **mau** é a dos **bons**. Neutros não são facção rival de ninguém.
+- Quando morre um bom ou um mau, os **2 níveis** são divididos igualmente entre os membros **vivos** da facção rival:
+  - 1 membro: ele recebe 2 níveis;
+  - 2 membros: cada um recebe 1 nível;
+  - 3 ou mais membros: **ninguém** recebe;
+  - nenhum membro vivo: ninguém recebe.
+- Quando morre um **neutro**, ninguém recebe níveis.
+- Os membros são contados pelo alinhamento **no instante da morte**, depois de aplicado o dano. Quem morre nesse mesmo instante não conta como membro nem recebe.
 
 **Resolução do dano**
 
@@ -250,7 +261,7 @@ Se um personagem muda de alinhamento, o alinhamento de seus aliados e fichas mud
 - O dano e o bloqueio de uma unidade usam o poder que ela tem **no instante em que a pilha esvazia**. Se a unidade sair de jogo antes disso, sua ação deixa de valer.
 - Retaliar devolve o dano mesmo que o retaliador morra no mesmo instante.
 - Efeitos que dependem de o alvo ter **sofrido** o dano só valem depois de ele ser aplicado, como novos itens na pilha.
-- Mortes simultâneas são possíveis. Se dois personagens principais se eliminam ao mesmo tempo, **os dois jogadores** ganham os 2 níveis.
+- Mortes simultâneas são possíveis. Cada morte dá seus níveis à facção rival, contada só entre os que continuam vivos depois de aplicado o dano.
 - Efeitos de "quando morrer" e auto-puxadas disparadas por uma morte entram numa pilha nova, depois que o dano foi aplicado.
 - Se **todos** os personagens restantes morrem no mesmo instante, ou se resta **só um vivo**, o jogo termina **na hora**, antes de esses efeitos entrarem na pilha (seção 13).
 
@@ -321,7 +332,7 @@ A história tem 3 atos. Cada ato começa com uma quest revelada da pilha comum, 
 **Fontes de nível**
 
 - Completar a quest do ato: níveis **iguais ao número do ato** (ato I dá 1, ato II dá 2, ato III dá 3).
-- Eliminar um jogador: **+2 níveis**.
+- Morte de um jogador bom ou mau: **2 níveis** para a facção rival, divididos entre os membros vivos dela; com 3 ou mais membros, ninguém recebe (seção 9).
 - Efeitos de carta (raros).
 
 Todo personagem começa no **nível 0**. O nível mínimo de ascensão varia por personagem, de 6 a 11, conforme a força do herói e as condições da ascensão.
@@ -370,7 +381,7 @@ O jogo termina em um destes casos:
 - Vence quem tem mais níveis.
 - Jogadores mortos não jogam, mas seus níveis contam.
 - Empate é aceito. O jogo termina empatado.
-- Se **todos** os personagens restantes morrem no mesmo instante, o jogo termina **na hora**, antes de qualquer efeito de "quando morrer" entrar na pilha. Conta-se os níveis, incluindo os bônus de eliminação.
+- Se **todos** os personagens restantes morrem no mesmo instante, o jogo termina **na hora**, antes de qualquer efeito de "quando morrer" entrar na pilha. Conta-se os níveis, incluindo os dados por essas mortes.
 - Se resta **só um personagem vivo**, o jogo também termina **na hora**, pela mesma regra.
 
 **Tempo da partida**
@@ -444,8 +455,8 @@ Esta seção não faz parte do livro final. Serve de lista de trabalho.
 - **Puxar do Eventos:** o efeito de busca é um tutor, e a carta entra de pé. Esses efeitos precisam custar muitas estrelas.
 - **Interceptar:** é a única defesa do principal contra ataques diretos. Precisa de preço em estrelas.
 - **Escudo sem dano mágico:** o Escudo cobre quase todo o dano, e Perfurante é o único contra. Testar se Escudo domina.
-- **Dano simultâneo:** eliminações mútuas dão 2 níveis a cada lado, e o jogo acaba na hora com um ou nenhum vivo. Testar se a agressão domina as quests.
-- **Ascensão fora das quests:** as quests dão no máximo 6 níveis e a ascensão pede de 6 a 11. Ascender depende de eliminações e efeitos de carta. Testar se isso é o desejado.
+- **Níveis por morte:** a facção rival pequena (1 ou 2 vivos) ganha muito com cada morte, e uma facção de 3 ou mais não ganha nada. Testar se isso incentiva trocar de alinhamento para ficar numa facção pequena, e se os neutros (que nunca recebem nem dão níveis por morte) ficam fortes ou fracos demais.
+- **Ascensão fora das quests:** as quests dão no máximo 6 níveis e a ascensão pede de 6 a 11. Ascender depende de níveis por morte e efeitos de carta. Testar se isso é o desejado.
 - **Quest 3 como vitória por contagem:** o bônus de 3 níveis precisa manter todos na disputa.
 - **Ascensão declarada:** o critério é conferido só na declaração, então só uma anulação a impede.
 - **Quests e estrelas:** calibrar pelo quanto cada quest favorece uma estratégia.
