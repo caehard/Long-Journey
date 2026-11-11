@@ -167,10 +167,17 @@
 .pj-base-centro .pj-rodape > span:last-child { grid-column: 3; justify-self: end; }
 
 /* ---------- runa: elemento embaixo, no centro, sobre a linha da moldura ---------- */
-.pj-runa { position: absolute; left: 50%; transform: translate(-50%, -50%); width: 160px; height: 160px; z-index: 3; }
-.pj-runa .pj-medalhao-solto { width: 160px; height: 160px; }
-/* runa avançada: o texto fica entre a arte e o elemento */
-.pj.tipo-runa .pj-texto { top: 486px; bottom: 252px; }
+.pj-medalhao-base { position: absolute; transform: translate(-50%, -50%); width: 160px; height: 160px; z-index: 3; }
+.pj-medalhao-base .pj-medalhao-solto { width: 160px; height: 160px; }
+/* runa avançada, campo e retiro: o texto fica entre a arte e os medalhões de baixo */
+.pj.tipo-runa .pj-texto, .pj.tipo-campo .pj-texto, .pj.tipo-retiro .pj-texto { top: 470px; bottom: 252px; }
+
+/* runa, campo e retiro: nome centralizado sobre a linha de cima (dados.PJ_NOME_CENTRO_*) */
+.pj-nome-linha.centro { left: 50%; transform: translateX(-50%); }
+.pj-nome-linha.centro .pj-barra-nome {
+  width: 330px; min-width: 0; max-width: none; padding: 0 22px;
+  border-left: 3px solid var(--prata); border-radius: 4px;
+}
 
 /* ---------- estandarte avançado: estrela rúnica no lugar do anel ---------- */
 .pj-bandeira .pano-estrela { stroke-width: 3; stroke-linejoin: round; }

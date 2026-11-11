@@ -227,8 +227,12 @@ POSICOES_CHAVES = [(0, 0), (52.2, 0), (26.1, 45.4), (78.3, 45.4), (52.2, 90.8)]
 PJ_NOME_TOPO, PJ_NOME_ALTURA = 505, 54       # barra do nome
 PJ_PANO_DIREITA = 36                         # estandarte: distância da borda direita
 PJ_NOME_TOPO_QUEST = 385                     # na quest o nome sobe para os atos caberem
-PJ_NOME_TOPO_RUNA = 58                       # na runa o nome fica no alto
 PJ_RUNA_BASE, PJ_RUNA_VAO = 716, 84          # runa: linha de baixo mais alta, aberta em volta do elemento
+# runa, campo e retiro: nome centralizado sobre a linha de cima (a linha abre embaixo dele)
+PJ_NOME_CENTRO_TOPO, PJ_NOME_CENTRO_LARG = 0, 330
+PJ_ATO_LARG = 68                             # o pentágono do ato colado ao nome (86 px, 18 por baixo da barra)
+# campo e retiro: medalhões nas quinas de baixo da moldura (centro x) e quanto a linha abre em volta
+PJ_QUINA_ESQ, PJ_QUINA_DIR, PJ_QUINA_VAO = 80, 550, 84
 PJ_CAIXA_ESQ, PJ_CAIXA_TOPO = 234, 700       # caixa de evolução/ascensão (canto de baixo à esquerda)
 PJ_CAIXA_INCL, PJ_CAIXA_ALTURA = 60, 180     # borda esquerda inclinada: 60 px mais para dentro no topo
 
@@ -262,32 +266,42 @@ def _raca_e_pano(c, f, unico):
 
 
 def _cortes_moldura(c):
-    """Trechos da moldura do personagem (em px da carta), com chanfro nas quinas e mais grossa
-    perto delas (simbolos.linha_moldura). A linha não passa por baixo do estandarte, da barra
-    do nome nem da caixa de evolução: ela é interrompida nesses lugares (não é só escondida),
-    para nada aparecer atrás do que é transparente."""
+    """Trechos da moldura (em px da carta), com chanfro nas quinas e mais grossa perto delas
+    (simbolos.linha_moldura). A linha não passa por baixo do estandarte, da barra do nome, da
+    caixa de evolução nem dos medalhões de baixo: ela é interrompida nesses lugares (não é só
+    escondida), para nada aparecer atrás do que é transparente."""
     e, d, t, b = 22.5, 630 - 22.5, 22.5, 880 - 96 - 2.5   # centro da linha
-    runa = c.get("runa_medalhao")
-    if runa:
-        b = PJ_RUNA_BASE
-    pano = c.get("pano_largura")
-    pano1 = 630 - PJ_PANO_DIREITA
-    # a base para na borda inclinada da caixa, na altura da linha
-    caixa_x = PJ_CAIXA_ESQ + PJ_CAIXA_INCL * (1 - (b - PJ_CAIXA_TOPO) / PJ_CAIXA_ALTURA)
     QUEBRA = None
-    # volta completa a partir do nome, descendo pela esquerda; QUEBRA = trecho interrompido
-    nome_topo = c.get("nome_topo", PJ_NOME_TOPO)
-    volta = [(e, nome_topo + PJ_NOME_ALTURA, False), (e, b, True)]
-    if c.get("criterio_rotulo"):
-        volta += [(caixa_x, b, False), QUEBRA, (d, PJ_CAIXA_TOPO, False)]
-    elif runa:
-        volta += [(315 - PJ_RUNA_VAO, b, False), QUEBRA, (315 + PJ_RUNA_VAO, b, False), (d, b, True)]
+    if c.get("nome_centro"):
+        # runa, campo, retiro: nome centralizado sobre a linha de cima, base alta com os medalhões
+        b = PJ_RUNA_BASE
+        largura = PJ_NOME_CENTRO_LARG + (PJ_ATO_LARG if c.get("ato_minimo") else 0)
+        n0, n1 = 315 - largura / 2 - 6, 315 + largura / 2 + 6
+        volta = [(n1, t, False), (d, t, True)]
+        if c.get("quinas"):  # medalhões nas quinas de baixo: as laterais e a base param antes deles
+            topo_quina = b - PJ_QUINA_VAO
+            volta += [(d, topo_quina, False), QUEBRA, (PJ_QUINA_DIR - PJ_QUINA_VAO, b, False),
+                      (PJ_QUINA_ESQ + PJ_QUINA_VAO, b, False), QUEBRA, (e, topo_quina, False)]
+        else:                # runa: o elemento no centro de baixo
+            volta += [(d, b, True), (315 + PJ_RUNA_VAO, b, False), QUEBRA,
+                      (315 - PJ_RUNA_VAO, b, False), (e, b, True)]
+        volta += [(e, t, True), (n0, t, False)]
     else:
-        volta += [(d, b, True)]
-    volta += [(d, t, True)]
-    if pano:
-        volta += [(pano1, t, False), QUEBRA, (pano1 - pano, t, False)]
-    volta += [(e, t, True), (e, nome_topo, False)]
+        pano = c.get("pano_largura")
+        pano1 = 630 - PJ_PANO_DIREITA
+        # a base para na borda inclinada da caixa, na altura da linha
+        caixa_x = PJ_CAIXA_ESQ + PJ_CAIXA_INCL * (1 - (b - PJ_CAIXA_TOPO) / PJ_CAIXA_ALTURA)
+        # volta completa a partir do nome, descendo pela esquerda; QUEBRA = trecho interrompido
+        nome_topo = c.get("nome_topo", PJ_NOME_TOPO)
+        volta = [(e, nome_topo + PJ_NOME_ALTURA, False), (e, b, True)]
+        if c.get("criterio_rotulo"):
+            volta += [(caixa_x, b, False), QUEBRA, (d, PJ_CAIXA_TOPO, False)]
+        else:
+            volta += [(d, b, True)]
+        volta += [(d, t, True)]
+        if pano:
+            volta += [(pano1, t, False), QUEBRA, (pano1 - pano, t, False)]
+        volta += [(e, t, True), (e, nome_topo, False)]
     trechos, atual = [], []
     for ponto in volta:
         if ponto is QUEBRA:
@@ -426,7 +440,7 @@ def _layout(c):
     for k, v in (("linhas_raca", []), ("bandeira", None), ("pano_largura", None), ("poder_svg", None),
                  ("chaves_pos", []), ("criterio_rotulo", None), ("quina_svg", None), ("atos", None),
                  ("recompensa", ""), ("lado", ""), ("sem_texto", False), ("ato_minimo", None),
-                 ("runa_medalhao", None)):
+                 ("medalhoes_base", []), ("nome_centro", False), ("quinas", False)):
         c.setdefault(k, v)
     # só o personagem único tem a estrela embaixo à esquerda; nos outros ela fica no centro
     c["base_centro"] = not (c["tipo"] == "personagem" and not c["ficha"])
@@ -483,21 +497,28 @@ def _local(d, cfg, val, origem):
             val.aviso("runa básica não tem caixa de texto: texto e ambientação não aparecem")
         if not c["avancado"]:
             c["sem_texto"] = True
-        # sem estandarte e sem texto vertical: o nome sobe e o elemento desce para o centro de
-        # baixo, sobre a linha da moldura; a estrela rúnica em volta é o que diz "avançada"
-        c["nome_topo"] = PJ_NOME_TOPO_RUNA
-        c["runa_base"] = PJ_RUNA_BASE
-        c["runa_medalhao"] = medalhao_solto(
+        # sem estandarte e sem texto vertical: o nome fica centralizado no topo e o elemento no
+        # centro de baixo, sobre a linha da moldura; a estrela rúnica em volta diz "avançada"
+        c["nome_centro"] = True
+        c["nome_topo"] = PJ_NOME_CENTRO_TOPO
+        c["medalhoes_base"] = [(medalhao_solto(
             circulo_elementos(elementos), c["tema"]["a"], c["avancado"],
-            " · ".join([e["nome"] for e in elementos] + (["runa avançada"] if c["avancado"] else ["runa básica"])))
+            " · ".join([e["nome"] for e in elementos] + (["runa avançada"] if c["avancado"] else ["runa básica"]))),
+            315, PJ_RUNA_BASE)]
         return [("runa", c, "")]
-    # estandarte: o elemento no medalhão e, embaixo, separado e do mesmo tamanho, o ícone do tipo
-    # (com a estrela rúnica se for avançado)
+    # o design da runa: sem estandarte nem texto vertical, nome centralizado no topo; nas quinas de
+    # baixo da moldura, o ícone do tipo (esquerda; estrela rúnica se avançado) e o elemento (direita)
     icone = dict(simbolo(cfg, "locais", d["tipo"]), nome=NOMES_LOCAL[d["tipo"]])
-    c["icone_local"] = circulo_local(icone, c["tema"]["a"], c["avancado"])
-    _pano(c, [NOMES_LOCAL[d["tipo"]], "Avançado" if c["avancado"] else "Básico"],
-          circulo_elementos(elementos), segundo=interno_slot(icone, c["tema"]["a"]),
-          segundo_avancado=c["avancado"], nome_segundo=icone["nome"] + (" avançado" if c["avancado"] else ""))
+    cor = c["tema"]["a"]
+    c["nome_centro"] = True
+    c["nome_topo"] = PJ_NOME_CENTRO_TOPO
+    c["quinas"] = True
+    c["medalhoes_base"] = [
+        (medalhao_solto(interno_slot(icone, cor), cor, c["avancado"],
+                        icone["nome"] + (" avançado" if c["avancado"] else " básico")), PJ_QUINA_ESQ, PJ_RUNA_BASE),
+        (medalhao_solto(circulo_elementos(elementos), cor, False,
+                        " · ".join(e["nome"] for e in elementos)), PJ_QUINA_DIR, PJ_RUNA_BASE),
+    ]
     return [("local", c, "")]
 
 

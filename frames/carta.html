@@ -33,10 +33,11 @@
     {% endif %}
 
     {% if c.bandeira %}<div class="pj-pano">{{ c.bandeira }}</div>{% endif %}
-    {# runa: o elemento embaixo, no centro, sobre a linha da moldura (aberta em volta dele) #}
-    {% if c.runa_medalhao %}<div class="pj-runa" style="top: {{ c.runa_base }}px">{{ c.runa_medalhao }}</div>{% endif %}
+    {# runa: o elemento embaixo, no centro; campo e retiro: o ícone do tipo e o elemento nas
+       quinas de baixo; sempre sobre a linha da moldura, que abre em volta deles #}
+    {% for svg, x, y in c.medalhoes_base %}<div class="pj-medalhao-base" style="left: {{ x }}px; top: {{ y }}px">{{ svg }}</div>{% endfor %}
 
-    <div class="pj-nome-linha"{% if c.nome_topo is defined %} style="top: {{ c.nome_topo - 15 }}px"{% endif %}>
+    <div class="pj-nome-linha{% if c.nome_centro %} centro{% endif %}"{% if c.nome_topo is defined %} style="top: {{ c.nome_topo - 15 }}px"{% endif %}>
       <div class="pj-barra-nome"><div class="nome ajustar-largura">{{ c.nome }}</div></div>
       {% if c.poder_svg %}<div class="pj-poder">{{ c.poder_svg }}</div>{% endif %}
       {# ato mínimo (ação, item, campo, retiro, runa): o pentágono de sempre, colado ao nome #}
