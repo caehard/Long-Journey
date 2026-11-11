@@ -467,10 +467,10 @@ def _medalhao(interno, cor, cx, cy, avancado=False, detalhe=True):
     return "".join(partes)
 
 
-def _anexo(conteudo, cor, cx, cy):
-    """Círculo menor preso ao medalhão, embaixo à direita (desenhado antes dele: fica atrás).
-    O conteúdo é um SVG de 100 x 100."""
-    x, y = cx + 78 * math.cos(math.radians(45)), cy + 78 * math.sin(math.radians(45))
+def _anexo(conteudo, cor, cx, cy, angulo=45):
+    """Círculo menor preso ao medalhão (desenhado antes dele: fica atrás); por padrão embaixo à
+    direita (45°; 135° = embaixo à esquerda). O conteúdo é um SVG de 100 x 100."""
+    x, y = cx + 78 * math.cos(math.radians(angulo)), cy + 78 * math.sin(math.radians(angulo))
     return (f'<circle class="pano-anel" cx="{_f(x)}" cy="{_f(y)}" r="24" stroke="{cor}"/>'
             f'<svg x="{_f(x - 16)}" y="{_f(y - 16)}" width="32" height="32" viewBox="0 0 100 100">{conteudo}</svg>')
 
@@ -502,6 +502,16 @@ def anexo_icone(s):
             f'font-weight="700" font-size="40" fill="#efe6d2">{s["sigla"]}</text>')
 
 
+def anexo_classe(s, cor):
+    """Glifo da classe (estandarte de 80 x 100, centro 40,43) centrado num círculo de 100 x 100."""
+    k = 1.35
+    return f'<g transform="translate({_f(50 - 40 * k)} {_f(50 - 43 * k)}) scale({k})">{_glifo_classe(s, cor)}</g>'
+
+
+# ângulos dos círculos presos ao medalhão, por quantidade: um à direita; dois simétricos; três com um embaixo
+ANGULOS_ANEXOS = {1: [45], 2: [135, 45], 3: [135, 90, 45]}
+
+
 def anexo_moedas(valor):
     return (f'<g opacity="0.45">{_corpo_svg(MOEDA_ICONE)}</g>'
             f'<text x="50" y="52" text-anchor="middle" dominant-baseline="central" font-family="Source Sans 3, sans-serif" '
@@ -522,7 +532,7 @@ def interno_slot(s, cor):
 
 
 def bandeira(cor, centro=None, anexo=None, classes=(), avancado=False, detalhe=True, titulo="",
-             segundo=None, segundo_avancado=False):
+             segundo=None, segundo_avancado=False, anexos=()):
     """SVG do estandarte (Markup), ou None se não houver nada para pendurar nele.
     centro: SVG de 100 x 100 do medalhão; anexo: SVG de 100 x 100 do círculo preso a ele;
     segundo: SVG de 100 x 100 de um segundo medalhão, do mesmo tamanho, separado embaixo do
@@ -534,6 +544,9 @@ def bandeira(cor, centro=None, anexo=None, classes=(), avancado=False, detalhe=T
         cx, cy = largura / 2, 92
         if anexo:
             partes.append(_anexo(anexo, cor, cx, cy))
+        # vários círculos presos (classes da ação): simétricos, um de cada lado
+        for conteudo, ang in zip(anexos, ANGULOS_ANEXOS.get(len(anexos), ANGULOS_ANEXOS[3])):
+            partes.append(_anexo(conteudo, cor, cx, cy, ang))
         partes.append(_medalhao(centro, cor, cx, cy, avancado, detalhe))
         fim = 266 if classes else 196   # onde as laterais do pano terminam e começa a ponta
         if segundo:

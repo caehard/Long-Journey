@@ -10,7 +10,7 @@ import re
 import unicodedata
 from pathlib import Path
 
-from .simbolos import PANO_ESTREITO, PANO_LARGO, anexo_icone, medalhao_solto, anexo_moedas, bandeira, bandeira_personagem, interno_slot, circulo_elementos, estrela_lapidada, linha_moldura, simbolo_quina, circulo_local, circulo_runa_avancada, hexagono_poder, medalhao_slot, moeda_custo, circulo_texto, estandarte, estandarte_duplo, selo_chave, tema
+from .simbolos import PANO_ESTREITO, PANO_LARGO, anexo_classe, anexo_icone, medalhao_solto, anexo_moedas, bandeira, bandeira_personagem, interno_slot, circulo_elementos, estrela_lapidada, linha_moldura, simbolo_quina, circulo_local, circulo_runa_avancada, hexagono_poder, medalhao_slot, moeda_custo, circulo_texto, estandarte, estandarte_duplo, selo_chave, tema
 
 RAIZ = Path(__file__).resolve().parent.parent
 FRAMES = RAIZ / "frames"
@@ -353,10 +353,13 @@ def _acao(d, cfg, val, origem):
     _com_classes(c, d, cfg, val)
     c["subtipos_s"] = _simbolos(d, cfg, val, "subtipos", "subtipos_acao", restrito=True)
     _com_elementos(c, _elementos(d, cfg, val, "elementos", 3))
-    # estandarte: elementos (com o custo de carga por cima) e a classe embaixo; o ato mínimo
-    # fica no pentágono colado ao nome (carta.html)
+    # estandarte: elementos (com o custo de carga por cima) e a classe num círculo preso ao
+    # medalhão, onde o item tem as moedas; com 2 classes, uma de cada lado. O ato mínimo fica no
+    # pentágono colado ao nome (carta.html)
+    if len(c["classes_s"]) > 3:
+        val.aviso(f'{len(c["classes_s"])} classes: só as 3 primeiras aparecem no estandarte')
     _pano(c, [" · ".join(x["nome"] for x in c["subtipos_s"])],
-          c["circulo"], None, c["classes_s"])
+          c["circulo"], classes_anexo=c["classes_s"][:3])
     return [("acao", c, "")]
 
 
@@ -437,12 +440,14 @@ def _personagem(d, cfg, val, origem):
 
 
 def _pano(c, linhas, centro=None, anexo=None, classes=(), avancado=False, detalhe=True,
-          segundo=None, segundo_avancado=False, nome_segundo=""):
+          segundo=None, segundo_avancado=False, nome_segundo="", classes_anexo=()):
     """Layout novo (frames/carta.html): texto vertical do canto de cima à esquerda e estandarte."""
     c["linhas_raca"] = [x for x in linhas if x]
-    nomes = [e["nome"] for e in c.get("elementos_s", [])] + [s["nome"] for s in classes] + ([nome_segundo] if nome_segundo else [])
-    c["bandeira"] = bandeira(c["tema"]["a"], centro, anexo, classes, avancado, detalhe, " · ".join(nomes),
-                             segundo, segundo_avancado)
+    nomes = ([e["nome"] for e in c.get("elementos_s", [])] + [s["nome"] for s in (*classes, *classes_anexo)]
+             + ([nome_segundo] if nome_segundo else []))
+    cor = c["tema"]["a"]
+    c["bandeira"] = bandeira(cor, centro, anexo, classes, avancado, detalhe, " · ".join(nomes),
+                             segundo, segundo_avancado, [anexo_classe(s, cor) for s in classes_anexo])
     c["pano_largura"] = (PANO_LARGO if centro else PANO_ESTREITO) if c["bandeira"] else None
 
 
