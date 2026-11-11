@@ -110,13 +110,13 @@
     {% if c.quina_svg %}<div class="pj-quina">{{ c.quina_svg }}</div>{% endif %}
     {% endif %}
 
-    <footer class="pj-base{% if c.base_centro %} pj-base-centro{% endif %}">
+    <footer class="pj-base{% if c.base_centro %} pj-base-centro{% endif %}{% if c.base_grupo %} pj-base-grupo{% endif %}">
       {% if c.ficha %}
       <span class="ficha-marca">Ficha</span>
       {% else %}
       {{ c.estrela_svg }}
       {% endif %}
-      <span class="pj-rodape">{% if c.rotulo_numero %}<span>{{ c.rotulo_numero }}</span>{% endif %}<span>{{ c.rotulo_edicao }}</span></span>
+      <span class="pj-rodape">{% if c.rotulo_numero %}<span>{{ c.rotulo_numero }}</span>{% endif %}{% if c.rotulo_edicao %}<span>{{ c.rotulo_edicao }}</span>{% endif %}</span>
     </footer>
   </div>
 </div>

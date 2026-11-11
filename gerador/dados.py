@@ -230,7 +230,7 @@ PJ_PANO_DIREITA = 36                         # estandarte: distância da borda d
 PJ_NOME_TOPO_QUEST = 385                     # na quest o nome sobe para os atos caberem
 # linha de baixo da moldura com os medalhões nela: na runa a estrela vai para o canto esquerdo e a linha
 # desce mais; no campo/retiro os medalhões das quinas param acima do número e da edição
-PJ_RUNA_BASE, PJ_LOCAL_BASE = 784, 762
+PJ_RUNA_BASE, PJ_LOCAL_BASE = 784, 790
 # runa, campo e retiro: nome centralizado sobre a linha de cima (a linha abre embaixo dele)
 PJ_NOME_CENTRO_TOPO, PJ_NOME_CENTRO_LARG = 0, 330
 # campo e retiro: medalhões nas quinas de baixo da moldura (centro x)
@@ -460,7 +460,9 @@ def _layout(c):
         c.setdefault(k, v)
     # só o personagem único tem a estrela embaixo à esquerda; nos outros ela fica no centro
     # (e a runa, para a linha de baixo poder descer com o elemento no centro)
-    c["base_centro"] = not (c["tipo"] == "personagem" and not c["ficha"]) and c["tipo"] != "runa"
+    c["base_centro"] = not (c["tipo"] == "personagem" and not c["ficha"]) and c["tipo"] not in ("runa", "campo", "retiro")
+    # campo e retiro: os medalhões ocupam as quinas, então estrela e número ficam juntos no centro
+    c["base_grupo"] = c["tipo"] in ("campo", "retiro")
     _cortes_moldura(c)
     c["estrela_svg"] = (estrela_lapidada(c["estrelas"], f"{c['id']}{c['lado']}")
                         if c.get("estrelas") is not None and not c["ficha"] else None)

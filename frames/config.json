@@ -1,7 +1,7 @@
 {
   "colecao": {
     "total": "000",
-    "edicao": "Protótipo"
+    "edicao": ""
   },
 
   "_elementos": "A cor precisa bater com a do símbolo em frames/icones/elementos/<chave>.svg (ela pinta o anel das ações).",

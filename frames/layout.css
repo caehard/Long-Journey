@@ -164,14 +164,16 @@
 .pj-base-centro .pj-rodape > span { grid-row: 1; font-size: 12px; font-weight: 700;
   color: rgba(239, 230, 210, 0.75); text-shadow: 0 1px 2px #000; }
 .pj-base-centro .pj-rodape > span:first-child { grid-column: 1; justify-self: start; }
-.pj-base-centro .pj-rodape > span:last-child { grid-column: 3; justify-self: end; }
+.pj-base-centro .pj-rodape > span:last-child:not(:first-child) { grid-column: 3; justify-self: end; }
 
 /* ---------- runa: elemento embaixo, no centro, sobre a linha da moldura ---------- */
 .pj-medalhao-base { position: absolute; transform: translate(-50%, -50%); width: 160px; height: 160px; z-index: 3; }
 .pj-medalhao-base .pj-medalhao-solto { width: 160px; height: 160px; }
 /* runa avançada, campo e retiro: o texto fica entre a arte e os medalhões de baixo */
 .pj.tipo-runa .pj-texto { top: 470px; bottom: 180px; }
-.pj.tipo-campo .pj-texto, .pj.tipo-retiro .pj-texto { top: 470px; bottom: 202px; }
+.pj.tipo-campo .pj-texto, .pj.tipo-retiro .pj-texto { top: 470px; bottom: 174px; }
+/* campo e retiro: estrela e número juntos no centro, entre os medalhões das quinas */
+.pj .pj-base.pj-base-grupo { left: 160px; right: 160px; justify-content: center; }
 /* a base da moldura desceu: a estrela desce junto para não encostar no medalhão do centro */
 .pj.tipo-runa .pj-base, .pj.tipo-campo .pj-base, .pj.tipo-retiro .pj-base { bottom: 8px; }
 
