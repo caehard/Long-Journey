@@ -228,7 +228,9 @@ POSICOES_CHAVES = [(0, 0), (52.2, 0), (26.1, 45.4), (78.3, 45.4), (52.2, 90.8)]
 PJ_NOME_TOPO, PJ_NOME_ALTURA = 505, 54       # barra do nome
 PJ_PANO_DIREITA = 36                         # estandarte: distância da borda direita
 PJ_NOME_TOPO_QUEST = 385                     # na quest o nome sobe para os atos caberem
-PJ_RUNA_BASE = 734                           # runa, campo, retiro: linha de baixo mais alta, com os medalhões nela
+# linha de baixo da moldura com os medalhões nela: na runa a estrela vai para o canto esquerdo e a linha
+# desce mais; no campo/retiro os medalhões das quinas param acima do número e da edição
+PJ_RUNA_BASE, PJ_LOCAL_BASE = 784, 762
 # runa, campo e retiro: nome centralizado sobre a linha de cima (a linha abre embaixo dele)
 PJ_NOME_CENTRO_TOPO, PJ_NOME_CENTRO_LARG = 0, 330
 # campo e retiro: medalhões nas quinas de baixo da moldura (centro x)
@@ -279,7 +281,7 @@ def _cortes_moldura(c):
     if c.get("nome_centro"):
         # runa, campo, retiro: nome centralizado sobre a linha de cima, base alta com os medalhões;
         # a linha termina um pouco por dentro do contorno de cada medalhão (entra por baixo do anel)
-        b = PJ_RUNA_BASE
+        b = c["base_y"]
         folga = 18 if c.get("ato_minimo") else 6   # a placa do ato é 12 px mais larga de cada lado
         n0, n1 = 315 - PJ_NOME_CENTRO_LARG / 2 - folga, 315 + PJ_NOME_CENTRO_LARG / 2 + folga
         volta = [(n1, t, False), (d, t, True)]
@@ -452,7 +454,8 @@ def _layout(c):
                  ("medalhoes_base", []), ("nome_centro", False), ("quinas", False)):
         c.setdefault(k, v)
     # só o personagem único tem a estrela embaixo à esquerda; nos outros ela fica no centro
-    c["base_centro"] = not (c["tipo"] == "personagem" and not c["ficha"])
+    # (e a runa, para a linha de baixo poder descer com o elemento no centro)
+    c["base_centro"] = not (c["tipo"] == "personagem" and not c["ficha"]) and c["tipo"] != "runa"
     _cortes_moldura(c)
     c["estrela_svg"] = (estrela_lapidada(c["estrelas"], f"{c['id']}{c['lado']}")
                         if c.get("estrelas") is not None and not c["ficha"] else None)
@@ -514,6 +517,7 @@ def _local(d, cfg, val, origem):
             circulo_elementos(elementos), c["tema"]["a"], c["avancado"],
             " · ".join([e["nome"] for e in elementos] + (["runa avançada"] if c["avancado"] else ["runa básica"]))),
             315, PJ_RUNA_BASE)]
+        c["base_y"] = PJ_RUNA_BASE
         return [("runa", c, "")]
     # o design da runa: sem estandarte nem texto vertical, nome centralizado no topo; nas quinas de
     # baixo da moldura, o ícone do tipo (esquerda) e o elemento (direita), os dois com a estrela
@@ -525,10 +529,11 @@ def _local(d, cfg, val, origem):
     c["quinas"] = True
     c["medalhoes_base"] = [
         (medalhao_solto(interno_slot(icone, cor), cor, c["avancado"],
-                        icone["nome"] + (" avançado" if c["avancado"] else " básico")), PJ_QUINA_ESQ, PJ_RUNA_BASE),
+                        icone["nome"] + (" avançado" if c["avancado"] else " básico")), PJ_QUINA_ESQ, PJ_LOCAL_BASE),
         (medalhao_solto(circulo_elementos(elementos), cor, c["avancado"],
-                        " · ".join(e["nome"] for e in elementos)), PJ_QUINA_DIR, PJ_RUNA_BASE),
+                        " · ".join(e["nome"] for e in elementos)), PJ_QUINA_DIR, PJ_LOCAL_BASE),
     ]
+    c["base_y"] = PJ_LOCAL_BASE
     return [("local", c, "")]
 
 

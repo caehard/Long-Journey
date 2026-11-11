@@ -170,7 +170,8 @@
 .pj-medalhao-base { position: absolute; transform: translate(-50%, -50%); width: 160px; height: 160px; z-index: 3; }
 .pj-medalhao-base .pj-medalhao-solto { width: 160px; height: 160px; }
 /* runa avançada, campo e retiro: o texto fica entre a arte e os medalhões de baixo */
-.pj.tipo-runa .pj-texto, .pj.tipo-campo .pj-texto, .pj.tipo-retiro .pj-texto { top: 470px; bottom: 228px; }
+.pj.tipo-runa .pj-texto { top: 470px; bottom: 180px; }
+.pj.tipo-campo .pj-texto, .pj.tipo-retiro .pj-texto { top: 470px; bottom: 202px; }
 /* a base da moldura desceu: a estrela desce junto para não encostar no medalhão do centro */
 .pj.tipo-runa .pj-base, .pj.tipo-campo .pj-base, .pj.tipo-retiro .pj-base { bottom: 8px; }
 
