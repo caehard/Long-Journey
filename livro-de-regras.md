@@ -25,7 +25,7 @@ Os valores fixos do jogo ficam nesta tabela. Cada um é detalhado na seção ind
 | Ações de carta por turno | No máximo 1 por runa (3) | 6 |
 | Quests na pilha | 2 por jogador, sorteadas | 4, 11 |
 | Níveis de uma quest | Igual ao número do ato (1, 2 ou 3) | 11 |
-| Níveis por morte de um jogador | 2, divididos entre os vivos da facção rival (nenhum com 3 ou mais) | 9, 11 |
+| Níveis por morte de um jogador | Jogadores vivos − 2, divididos entre os vivos da facção rival (arredonda para baixo) | 9, 11 |
 | Nível inicial | 0 | 11 |
 | Nível mínimo de ascensão | Varia por personagem, de 6 a 11 | 12 |
 | Atos | 3 (não há ato 4) | 11 |
@@ -241,17 +241,15 @@ Se um personagem muda de alinhamento, o alinhamento de seus aliados e fichas mud
 
 - Cura: só personagens **comuns**, e só se estiverem no retiro durante o Hiato.
 - Um personagem principal morto não joga mais, mas seus níveis continuam contando.
-- Quando um personagem principal morre, a **facção rival** recebe **2 níveis**, divididos igualmente entre os membros dela (ver **Níveis por morte** abaixo). Não importa quem deu o golpe final.
+- Quando um personagem principal morre, a **facção rival** recebe níveis, divididos igualmente entre os membros dela (ver **Níveis por morte** abaixo). Não importa quem deu o golpe final.
 - Ao morrer, um personagem leva seus itens equipados ao descarte.
 
 **Níveis por morte**
 
 - Facção é o grupo de jogadores com o mesmo alinhamento. A facção rival de um personagem **bom** é a dos **maus**, e a de um **mau** é a dos **bons**. Neutros não são facção rival de ninguém.
-- Quando morre um bom ou um mau, os **2 níveis** são divididos igualmente entre os membros **vivos** da facção rival:
-  - 1 membro: ele recebe 2 níveis;
-  - 2 membros: cada um recebe 1 nível;
-  - 3 ou mais membros: **ninguém** recebe;
-  - nenhum membro vivo: ninguém recebe.
+- Quando morre um bom ou um mau, a facção rival recebe um total de níveis igual ao **número de jogadores vivos menos 2**. Conta-se quem estava vivo **imediatamente antes** da morte, incluindo o personagem que morreu.
+- Esse total é dividido igualmente entre os membros **vivos** da facção rival, arredondando **para baixo**; o resto se perde. Se a facção rival não tem membro vivo, ninguém recebe.
+- Exemplos: com 5 jogadores vivos, a morte dá 3 níveis (1 membro rival recebe 3; 2 membros recebem 1 cada; 3 membros recebem 1 cada). Com 4 vivos, dá 2. Com 3 vivos, dá 1 (com 2 membros rivais, ninguém recebe, porque 1 ÷ 2 arredonda para 0).
 - Quando morre um **neutro**, ninguém recebe níveis.
 - Os membros são contados pelo alinhamento **no instante da morte**, depois de aplicado o dano. Quem morre nesse mesmo instante não conta como membro nem recebe.
 
@@ -261,7 +259,7 @@ Se um personagem muda de alinhamento, o alinhamento de seus aliados e fichas mud
 - O dano e o bloqueio de uma unidade usam o poder que ela tem **no instante em que a pilha esvazia**. Se a unidade sair de jogo antes disso, sua ação deixa de valer.
 - Retaliar devolve o dano mesmo que o retaliador morra no mesmo instante.
 - Efeitos que dependem de o alvo ter **sofrido** o dano só valem depois de ele ser aplicado, como novos itens na pilha.
-- Mortes simultâneas são possíveis. Cada morte dá seus níveis à facção rival, contada só entre os que continuam vivos depois de aplicado o dano.
+- Mortes simultâneas são possíveis. Em cada morte, o total usa os jogadores vivos antes de o dano ser aplicado, e a divisão só os membros rivais que continuam vivos depois dele.
 - Efeitos de "quando morrer" e auto-puxadas disparadas por uma morte entram numa pilha nova, depois que o dano foi aplicado.
 - Se **todos** os personagens restantes morrem no mesmo instante, ou se resta **só um vivo**, o jogo termina **na hora**, antes de esses efeitos entrarem na pilha (seção 13).
 
@@ -332,7 +330,7 @@ A história tem 3 atos. Cada ato começa com uma quest revelada da pilha comum, 
 **Fontes de nível**
 
 - Completar a quest do ato: níveis **iguais ao número do ato** (ato I dá 1, ato II dá 2, ato III dá 3).
-- Morte de um jogador bom ou mau: **2 níveis** para a facção rival, divididos entre os membros vivos dela; com 3 ou mais membros, ninguém recebe (seção 9).
+- Morte de um jogador bom ou mau: a facção rival recebe **jogadores vivos − 2** níveis, divididos entre os membros vivos dela, arredondando para baixo (seção 9).
 - Efeitos de carta (raros).
 
 Todo personagem começa no **nível 0**. O nível mínimo de ascensão varia por personagem, de 6 a 11, conforme a força do herói e as condições da ascensão.
@@ -455,7 +453,7 @@ Esta seção não faz parte do livro final. Serve de lista de trabalho.
 - **Puxar do Eventos:** o efeito de busca é um tutor, e a carta entra de pé. Esses efeitos precisam custar muitas estrelas.
 - **Interceptar:** é a única defesa do principal contra ataques diretos. Precisa de preço em estrelas.
 - **Escudo sem dano mágico:** o Escudo cobre quase todo o dano, e Perfurante é o único contra. Testar se Escudo domina.
-- **Níveis por morte:** a facção rival pequena (1 ou 2 vivos) ganha muito com cada morte, e uma facção de 3 ou mais não ganha nada. Testar se isso incentiva trocar de alinhamento para ficar numa facção pequena, e se os neutros (que nunca recebem nem dão níveis por morte) ficam fortes ou fracos demais.
+- **Níveis por morte:** as primeiras mortes valem mais (o total cai conforme os jogadores morrem), e a facção rival pequena ganha muito mais por membro. Testar se isso torna o início da partida agressivo demais, se incentiva trocar de alinhamento para ficar numa facção pequena, e se os neutros (que nunca recebem nem dão níveis por morte) ficam fortes ou fracos demais.
 - **Ascensão fora das quests:** as quests dão no máximo 6 níveis e a ascensão pede de 6 a 11. Ascender depende de níveis por morte e efeitos de carta. Testar se isso é o desejado.
 - **Quest 3 como vitória por contagem:** o bônus de 3 níveis precisa manter todos na disputa.
 - **Ascensão declarada:** o critério é conferido só na declaração, então só uma anulação a impede.
