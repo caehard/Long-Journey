@@ -41,7 +41,7 @@
       <div class="pj-barra-nome"><div class="nome ajustar-largura">{{ c.nome }}</div></div>
       {% if c.poder_svg %}<div class="pj-poder">{{ c.poder_svg }}</div>{% endif %}
       {# ato mínimo (ação, item, campo, retiro, runa): o pentágono de sempre, colado ao nome #}
-      {% if c.ato_minimo %}
+      {% if c.ato_minimo and not c.nome_centro %}
       <div class="pj-ato-nome">
         <svg class="ato-pent" viewBox="0 0 70 60" role="img" aria-label="ato mínimo {{ c.ato_minimo }}">
           <polygon points="3,3 44,3 67,30 44,57 3,57"/>
@@ -50,6 +50,16 @@
       </div>
       {% endif %}
     </div>
+
+    {# runa, campo, retiro: o ato mínimo pendurado embaixo do nome, com a ponta para baixo #}
+    {% if c.ato_minimo and c.nome_centro %}
+    <div class="pj-ato-abaixo" style="top: {{ c.nome_topo + 50 }}px">
+      <svg class="ato-pent" viewBox="0 0 60 70" role="img" aria-label="ato mínimo {{ c.ato_minimo }}">
+        <polygon points="3,3 57,3 57,44 30,67 3,44"/>
+        <text x="30" y="29">{{ c.ato_minimo|romano }}</text>
+      </svg>
+    </div>
+    {% endif %}
 
     {% if c.atos %}
     {# quest: um texto por ato, cada um com o pentágono do ato; recompensa adicional embaixo #}

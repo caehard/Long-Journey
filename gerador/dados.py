@@ -5,6 +5,7 @@ Uma face é um dict pronto para o template do frame correspondente.
 """
 
 import json
+import math
 import re
 import unicodedata
 from pathlib import Path
@@ -227,12 +228,15 @@ POSICOES_CHAVES = [(0, 0), (52.2, 0), (26.1, 45.4), (78.3, 45.4), (52.2, 90.8)]
 PJ_NOME_TOPO, PJ_NOME_ALTURA = 505, 54       # barra do nome
 PJ_PANO_DIREITA = 36                         # estandarte: distância da borda direita
 PJ_NOME_TOPO_QUEST = 385                     # na quest o nome sobe para os atos caberem
-PJ_RUNA_BASE, PJ_RUNA_VAO = 716, 84          # runa: linha de baixo mais alta, aberta em volta do elemento
+PJ_RUNA_BASE = 734                           # runa, campo, retiro: linha de baixo mais alta, com os medalhões nela
 # runa, campo e retiro: nome centralizado sobre a linha de cima (a linha abre embaixo dele)
 PJ_NOME_CENTRO_TOPO, PJ_NOME_CENTRO_LARG = 0, 330
-PJ_ATO_LARG = 68                             # o pentágono do ato colado ao nome (86 px, 18 por baixo da barra)
-# campo e retiro: medalhões nas quinas de baixo da moldura (centro x) e quanto a linha abre em volta
-PJ_QUINA_ESQ, PJ_QUINA_DIR, PJ_QUINA_VAO = 80, 550, 84
+# campo e retiro: medalhões nas quinas de baixo da moldura (centro x)
+PJ_QUINA_ESQ, PJ_QUINA_DIR = 80, 550
+# raio visível do medalhão solto (anel simples / estrela rúnica): a linha termina um pouco
+# por dentro dele, para entrar por baixo do anel e o medalhão ficar encaixado na moldura
+PJ_MED_RAIO = {False: 60, True: 70}
+PJ_MED_ENCAIXE = 4
 PJ_CAIXA_ESQ, PJ_CAIXA_TOPO = 234, 700       # caixa de evolução/ascensão (canto de baixo à esquerda)
 PJ_CAIXA_INCL, PJ_CAIXA_ALTURA = 60, 180     # borda esquerda inclinada: 60 px mais para dentro no topo
 
@@ -273,18 +277,22 @@ def _cortes_moldura(c):
     e, d, t, b = 22.5, 630 - 22.5, 22.5, 880 - 96 - 2.5   # centro da linha
     QUEBRA = None
     if c.get("nome_centro"):
-        # runa, campo, retiro: nome centralizado sobre a linha de cima, base alta com os medalhões
+        # runa, campo, retiro: nome centralizado sobre a linha de cima, base alta com os medalhões;
+        # a linha termina um pouco por dentro do contorno de cada medalhão (entra por baixo do anel)
         b = PJ_RUNA_BASE
-        largura = PJ_NOME_CENTRO_LARG + (PJ_ATO_LARG if c.get("ato_minimo") else 0)
-        n0, n1 = 315 - largura / 2 - 6, 315 + largura / 2 + 6
+        n0, n1 = 315 - PJ_NOME_CENTRO_LARG / 2 - 6, 315 + PJ_NOME_CENTRO_LARG / 2 + 6
         volta = [(n1, t, False), (d, t, True)]
-        if c.get("quinas"):  # medalhões nas quinas de baixo: as laterais e a base param antes deles
-            topo_quina = b - PJ_QUINA_VAO
-            volta += [(d, topo_quina, False), QUEBRA, (PJ_QUINA_DIR - PJ_QUINA_VAO, b, False),
-                      (PJ_QUINA_ESQ + PJ_QUINA_VAO, b, False), QUEBRA, (e, topo_quina, False)]
+        raio = lambda avancado: PJ_MED_RAIO[avancado] - PJ_MED_ENCAIXE
+        if c.get("quinas"):
+            # medalhões nas quinas: a lateral desce até encontrar o círculo e a base sai dele
+            rd, re_ = raio(c.get("avancado", False)), raio(c.get("avancado", False))
+            dy_d = math.sqrt(max(rd ** 2 - (d - PJ_QUINA_DIR) ** 2, 0))
+            dy_e = math.sqrt(max(re_ ** 2 - (PJ_QUINA_ESQ - e) ** 2, 0))
+            volta += [(d, b - dy_d, False), QUEBRA, (PJ_QUINA_DIR - rd, b, False),
+                      (PJ_QUINA_ESQ + re_, b, False), QUEBRA, (e, b - dy_e, False)]
         else:                # runa: o elemento no centro de baixo
-            volta += [(d, b, True), (315 + PJ_RUNA_VAO, b, False), QUEBRA,
-                      (315 - PJ_RUNA_VAO, b, False), (e, b, True)]
+            r = raio(c.get("avancado", False))
+            volta += [(d, b, True), (315 + r, b, False), QUEBRA, (315 - r, b, False), (e, b, True)]
         volta += [(e, t, True), (n0, t, False)]
     else:
         pano = c.get("pano_largura")
@@ -507,7 +515,8 @@ def _local(d, cfg, val, origem):
             315, PJ_RUNA_BASE)]
         return [("runa", c, "")]
     # o design da runa: sem estandarte nem texto vertical, nome centralizado no topo; nas quinas de
-    # baixo da moldura, o ícone do tipo (esquerda; estrela rúnica se avançado) e o elemento (direita)
+    # baixo da moldura, o ícone do tipo (esquerda) e o elemento (direita), os dois com a estrela
+    # rúnica se for avançado
     icone = dict(simbolo(cfg, "locais", d["tipo"]), nome=NOMES_LOCAL[d["tipo"]])
     cor = c["tema"]["a"]
     c["nome_centro"] = True
@@ -516,7 +525,7 @@ def _local(d, cfg, val, origem):
     c["medalhoes_base"] = [
         (medalhao_solto(interno_slot(icone, cor), cor, c["avancado"],
                         icone["nome"] + (" avançado" if c["avancado"] else " básico")), PJ_QUINA_ESQ, PJ_RUNA_BASE),
-        (medalhao_solto(circulo_elementos(elementos), cor, False,
+        (medalhao_solto(circulo_elementos(elementos), cor, c["avancado"],
                         " · ".join(e["nome"] for e in elementos)), PJ_QUINA_DIR, PJ_RUNA_BASE),
     ]
     return [("local", c, "")]
