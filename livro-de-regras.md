@@ -1,6 +1,6 @@
 # Livro de Regras (rascunho v0.5)
 
-Atualizado em 11 de novembro de 2026.
+Atualizado em 18 de novembro de 2026.
 
 ## 1. Visão geral
 
@@ -9,7 +9,7 @@ Cada jogador conduz um personagem, o "rosto do deck", por até 3 atos de uma his
 - **Jogadores:** multiplayer, um único vencedor. Alianças e rivalidades mudam ao longo da partida, definidas pelo alinhamento (bom, mau, neutro).
 - **Decks:** construídos a partir de uma pool aberta e igual para todos, sem boosters.
 - **Equilíbrio:** o Star System limita cada jogador a 100 estrelas somando os dois decks e o herói.
-- **Duração:** até o fim da quest do ato 3, uma ascensão, ou o tempo combinado (opcional).
+- **Duração:** até o fim da quest do ato 3 (concluída ou perdida), uma ascensão, ou o tempo combinado (opcional).
 
 ## 2. Referência rápida
 
@@ -23,9 +23,10 @@ Os valores fixos do jogo ficam nesta tabela. Cada um é detalhado na seção ind
 | Mão inicial e padrão do Conto | Enredo (padrão 5) | 4, 5 |
 | Runas por jogador | 3 (personagem, campo, retiro) | 6 |
 | Ações de carta por turno | No máximo 1 por runa (3) | 6 |
-| Quests na pilha | 2 por jogador, sorteadas | 4, 11 |
+| Quests principais | Deck da temporada, comum a todos (um jogador traz) | 4, 11 |
+| Duração de uma quest principal | Número de turnos impresso na carta | 11 |
 | Níveis de uma quest | Igual ao número do ato (1, 2 ou 3) | 11 |
-| Níveis por morte de um jogador | Jogadores vivos − 2, divididos entre os vivos da facção rival (arredonda para baixo) | 9, 11 |
+| Níveis por morte de um não aliado | Neutro: 1 para cada neutro vivo. Bom ou mau: 2, divididos entre os vivos do alinhamento | 9, 11 |
 | Nível inicial | 0 | 11 |
 | Nível mínimo de ascensão | Varia por personagem, de 6 a 11 | 12 |
 | Atos | 3 (não há ato 4) | 11 |
@@ -43,7 +44,7 @@ Cada jogador monta dois decks a partir da pool aberta. Os dois juntos, mais o he
 
 **Deck de Eventos** (não embaralhado)
 
-- Contém itens lendários, aliados únicos, runas avançadas, campos de batalha, retiros e pelo menos 2 quests.
+- Contém itens lendários, aliados únicos, runas avançadas, campos de batalha, retiros e **side quests**.
 - Só se acessa por efeito de carta ou situação.
 - Cada carta do Eventos entra em **1 cópia** por deck.
 
@@ -52,7 +53,7 @@ Cada jogador monta dois decks a partir da pool aberta. Os dois juntos, mais o he
 - Cada carta tem um número de estrelas que indica sua força.
 - Cópias extras de uma carta da Jornada custam estrelas adicionais: 2ª cópia +1, 3ª cópia +2, 4ª cópia +3.
 - Fichas são o único tipo de carta sem estrelas.
-- Quests têm mais ou menos estrelas conforme o quanto favorecem uma estratégia específica.
+- Side quests têm mais ou menos estrelas conforme o quanto favorecem uma estratégia específica. As quests principais não fazem parte do deck de ninguém e não custam estrelas.
 - Não há teto formal de cópias. O custo progressivo regula.
 - Carta de elemento que as suas runas não cobrem não deveria estar no deck.
 
@@ -69,7 +70,7 @@ Cada jogador monta dois decks a partir da pool aberta. Os dois juntos, mais o he
 | Personagem único | Raça, clã, função. Classe e elemento são informações da carta, não subtipos. |
 | Item lendário | Arma de 1 mão, arma de 2 mãos, acessório, bota, peitoral, elmo, luvas |
 | Runa, campo de batalha, retiro | Básica ou avançada |
-| Quest | Nenhum |
+| Quest | Principal ou side quest |
 | Ficha | Subtipo transversal: qualquer tipo de carta pode ser ficha |
 
 Não há subtipo "magia". O que define a classe de uma ação é o símbolo impresso nela.
@@ -79,7 +80,7 @@ Não há subtipo "magia". O que define a classe de uma ação é o símbolo impr
 A partida começa com estes passos, nesta ordem:
 
 1. Cada jogador revela seu **personagem**.
-2. Cada jogador escolhe 2 quests do seu deck de Eventos. As quests de todos vão para uma **pilha comum**, que é embaralhada.
+2. Embaralha-se o **deck de quests da temporada**. Ele é comum a todos e só um jogador precisa trazê-lo.
 3. Sorteia-se o **primeiro jogador**. A ordem de turnos segue no sentido horário a partir dele.
 4. Cada jogador compra uma mão igual ao seu **enredo** (padrão 5). Não há mulligan.
 5. O primeiro jogador escolhe seu **alinhamento inicial** (bom, mau ou neutro). Os demais escolhem em sentido horário. O alinhamento é público.
@@ -241,17 +242,15 @@ Se um personagem muda de alinhamento, o alinhamento de seus aliados e fichas mud
 
 - Cura: só personagens **comuns**, e só se estiverem no retiro durante o Hiato.
 - Um personagem principal morto não joga mais, mas seus níveis continuam contando.
-- Quando um personagem principal morre, a **facção rival** recebe níveis, divididos igualmente entre os membros dela (ver **Níveis por morte** abaixo). Não importa quem deu o golpe final.
-- Ao morrer, um personagem leva seus itens equipados ao descarte.
+- Quando um personagem principal morre, quem não era aliado dele recebe níveis (ver **Níveis por morte**
 
-**Níveis por morte**
-
-- Facção é o grupo de jogadores com o mesmo alinhamento. A facção rival de um personagem **bom** é a dos **maus**, e a de um **mau** é a dos **bons**. Neutros não são facção rival de ninguém.
-- Quando morre um bom ou um mau, a facção rival recebe um total de níveis igual ao **número de jogadores vivos menos 2**. Conta-se quem estava vivo **imediatamente antes** da morte, incluindo o personagem que morreu.
-- Esse total é dividido igualmente entre os membros **vivos** da facção rival, arredondando **para baixo**; o resto se perde. Se a facção rival não tem membro vivo, ninguém recebe.
-- Exemplos: com 5 jogadores vivos, a morte dá 3 níveis (1 membro rival recebe 3; 2 membros recebem 1 cada; 3 membros recebem 1 cada). Com 4 vivos, dá 2. Com 3 vivos, dá 1 (com 2 membros rivais, ninguém recebe, porque 1 ÷ 2 arredonda para 0).
-- Quando morre um **neutro**, ninguém recebe níveis.
-- Os membros são contados pelo alinhamento **no instante da morte**, depois de aplicado o dano. Quem morre nesse mesmo instante não conta como membro nem recebe.
+- Aliados são os jogadores do **mesmo alinhamento**, bons com bons e maus com maus. Neutros não têm aliados.
+- Quando morre um personagem principal, cada jogador **vivo** que **não era aliado dele** recebe níveis:
+  - **Neutro:** ganha **1 nível**. Isso vale para a morte de qualquer outro personagem principal, inclusive de outro neutro.
+  - **Bom ou mau:** o seu alinhamento recebe **2 níveis**, divididos igualmente entre os membros vivos dele, arredondando para baixo. Com 1 membro, ele recebe 2; com 2, cada um recebe 1; com 3 ou mais, ninguém recebe.
+- A morte de um aliado não dá níveis.
+- O alinhamento de cada um é o do **instante da morte**, depois de aplicado o dano. Quem morre nesse mesmo instante não recebe.
+- Exemplo: 2 bons, 1 mau e 1 neutro. Se o mau morre, cada bom recebe 1 e o neutro recebe 1. Se o neutro morre, os bons dividem 2 (1 cada) e o mau recebe 2.
 
 **Resolução do dano**
 
@@ -259,7 +258,7 @@ Se um personagem muda de alinhamento, o alinhamento de seus aliados e fichas mud
 - O dano e o bloqueio de uma unidade usam o poder que ela tem **no instante em que a pilha esvazia**. Se a unidade sair de jogo antes disso, sua ação deixa de valer.
 - Retaliar devolve o dano mesmo que o retaliador morra no mesmo instante.
 - Efeitos que dependem de o alvo ter **sofrido** o dano só valem depois de ele ser aplicado, como novos itens na pilha.
-- Mortes simultâneas são possíveis. Em cada morte, o total usa os jogadores vivos antes de o dano ser aplicado, e a divisão só os membros rivais que continuam vivos depois dele.
+- Mortes simultâneas são possíveis. Cada morte dá níveis, separadamente, a quem continua vivo depois de aplicado o dano.
 - Efeitos de "quando morrer" e auto-puxadas disparadas por uma morte entram numa pilha nova, depois que o dano foi aplicado.
 - Se **todos** os personagens restantes morrem no mesmo instante, ou se resta **só um vivo**, o jogo termina **na hora**, antes de esses efeitos entrarem na pilha (seção 13).
 
@@ -318,29 +317,36 @@ Nas cartas finais, cada palavra-chave vira um símbolo na lateral. O X é um val
 
 ## 11. Atos, quests e níveis
 
-A história tem 3 atos. Cada ato começa com uma quest revelada da pilha comum, e a dificuldade das quests cresce a cada ato.
+A história tem 3 atos. Cada ato começa com uma **quest principal** revelada do deck de quests da temporada, e a dificuldade das quests cresce a cada ato.
 
-**Quests**
+**Quests principais**
 
+- Cada **temporada** do jogo tem o seu próprio deck de quests principais. Ele é comum a todos os jogadores, e só um jogador precisa trazê-lo para a partida.
+- Cada quest principal tem impresso o número de **turnos** que dura. Quando eles passam sem que ninguém a complete, a quest é **perdida**: ninguém ganha níveis por ela e o ato muda (transição de ato, abaixo).
 - Quem **completa a quest primeiro** ganha níveis, e o ato muda para todos. Só ele recebe o bônus.
 - Os demais perdem a chance de pontuar naquele ato, mas ganham acesso às cartas que só funcionam em atos superiores.
 - Quests ficam fora do jogo. Muitas criam missões em campo, como invocar um **inimigo neutro** (ex.: um dragão no campo de batalha).
 - O inimigo neutro age como o texto da quest ou da própria carta dele descreve. Neutros atacam e podem ser atacados por todos.
 
+**Side quests**
+
+- As side quests ficam no **deck de Eventos** de cada jogador e custam estrelas.
+- Só entram em jogo **puxadas por uma carta**, como as outras cartas do Eventos (seção 7).
+
 **Fontes de nível**
 
-- Completar a quest do ato: níveis **iguais ao número do ato** (ato I dá 1, ato II dá 2, ato III dá 3).
-- Morte de um jogador bom ou mau: a facção rival recebe **jogadores vivos − 2** níveis, divididos entre os membros vivos dela, arredondando para baixo (seção 9).
+- Completar a quest principal do ato: níveis **iguais ao número do ato** (ato I dá 1, ato II dá 2, ato III dá 3).
+- Morte de um personagem principal que não era seu aliado: 1 nível se você é neutro; 2 níveis divididos entre os vivos do seu alinhamento se você é bom ou mau (seção 9).
 - Efeitos de carta (raros).
 
 Todo personagem começa no **nível 0**. O nível mínimo de ascensão varia por personagem, de 6 a 11, conforme a força do herói e as condições da ascensão.
 
 **Transição de ato**
 
-A transição não entra na pilha e nenhuma de suas etapas pode ser respondida. A ação que completa a quest ainda passa pela pilha, e a transição só começa depois que ela resolve.
+A transição acontece quando a quest principal é concluída ou é perdida (acabam os turnos dela). Ela não entra na pilha e nenhuma de suas etapas pode ser respondida. A ação que completa a quest ainda passa pela pilha, e a transição só começa depois que ela resolve.
 
-1. A quest é concluída.
-2. Os níveis são dados a quem a completou.
+1. A quest é concluída ou perdida.
+2. Se foi concluída, os níveis são dados a quem a completou. Se foi perdida, ninguém recebe.
 3. Cada jogador neutro escolhe ganhar 1, perder 1 ou não mexer no karma, na ordem dos turnos. Em seguida, o alinhamento de todos é reavaliado.
 4. O ato muda e a nova quest é revelada.
 
@@ -348,7 +354,7 @@ Nada é limpo ou reiniciado. Cargas, danos e efeitos temporários permanecem. S�
 
 **Quest do ato 3**
 
-Não existe ato 4 nem quarta quest. Quando a quest do ato 3 é concluída, quem a completou recebe os níveis e o jogo termina na hora, com a contagem de níveis (seção 13).
+Não existe ato 4 nem quarta quest. Quando a quest do ato 3 é concluída, quem a completou recebe os níveis e o jogo termina na hora, com a contagem de níveis (seção 13). Se ela for perdida, o jogo também termina na hora, sem esses níveis.
 
 ## 12. Evolução e ascensão
 
@@ -371,6 +377,7 @@ O jogo termina em um destes casos:
 | --- | --- |
 | Um personagem **ascende** | Ele vence na hora |
 | A **quest do ato 3** é concluída | Quem a completou recebe os níveis, e conta-se os níveis de todos |
+| A **quest do ato 3** é perdida (acabam os turnos dela) | Conta-se os níveis de todos |
 | Só resta **um personagem vivo** | Conta-se os níveis de todos |
 | O **tempo combinado** acaba (regra opcional) | Termina-se a rodada atual e conta-se os níveis |
 
@@ -426,7 +433,10 @@ Esta seção não faz parte do livro final. Serve de lista de trabalho.
 
 **Ainda a definir**
 
-- [ ] **Cartas de quest:** condições de conclusão, estrelas e inimigos neutros. Ficam para o final.
+- [ ] **Cartas de quest:** condições de conclusão e inimigos neutros das quests principais; durações em turnos. Ficam para o final.
+- [ ] **Contagem dos turnos de uma quest principal:** cada turno de jogador conta 1, ou só cada rodada completa? Quando a contagem começa (no turno em que ela é revelada ou no seguinte)?
+- [ ] **Side quests:** o que dão ao serem completadas (níveis? outra recompensa?), se valem para um jogador só, e o que acontece quando não são completadas.
+- [ ] **Deck da temporada:** a quest principal de cada ato sai do topo do deck embaralhado, ou o deck é separado por ato?
 - [ ] Formato das cartas de reação, aliado único, item lendário, runa avançada, campo de batalha e retiro.
 - [ ] Palavras-chave que faltam definir e a forma final dos símbolos nas laterais (classe, elemento e palavras-chave).
 - [ ] Provocar e Vigilante: ideias em espera.
@@ -453,8 +463,9 @@ Esta seção não faz parte do livro final. Serve de lista de trabalho.
 - **Puxar do Eventos:** o efeito de busca é um tutor, e a carta entra de pé. Esses efeitos precisam custar muitas estrelas.
 - **Interceptar:** é a única defesa do principal contra ataques diretos. Precisa de preço em estrelas.
 - **Escudo sem dano mágico:** o Escudo cobre quase todo o dano, e Perfurante é o único contra. Testar se Escudo domina.
-- **Níveis por morte:** as primeiras mortes valem mais (o total cai conforme os jogadores morrem), e a facção rival pequena ganha muito mais por membro. Testar se isso torna o início da partida agressivo demais, se incentiva trocar de alinhamento para ficar numa facção pequena, e se os neutros (que nunca recebem nem dão níveis por morte) ficam fortes ou fracos demais.
-- **Ascensão fora das quests:** as quests dão no máximo 6 níveis e a ascensão pede de 6 a 11. Ascender depende de níveis por morte e efeitos de carta. Testar se isso é o desejado.
+- **Níveis por morte:** o neutro ganha 1 por qualquer morte, sem precisar lutar; testar se isso deixa o neutro passivo e forte demais em mesas grandes. Bons e maus só ganham numa facção de até 2 vivos; testar se isso incentiva manipular o karma para ficar numa facção pequena.
+- **Quest perdida:** com duração em turnos, uma mesa pode deixar a quest expirar de propósito para negar níveis ao líder. Testar as durações.
+- **Ascensão fora das quests:** as quests principais dão no máximo 6 níveis e a ascensão pede de 6 a 11. Ascender depende de níveis por morte e efeitos de carta. Testar se isso é o desejado.
 - **Quest 3 como vitória por contagem:** o bônus de 3 níveis precisa manter todos na disputa.
 - **Ascensão declarada:** o critério é conferido só na declaração, então só uma anulação a impede.
 - **Quests e estrelas:** calibrar pelo quanto cada quest favorece uma estratégia.

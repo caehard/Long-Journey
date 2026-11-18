@@ -27,6 +27,8 @@ Jogo de cartas multiplayer (um vencedor) em que cada jogador conduz um personage
 - Turno: Epílogo, Hiato, Conto, Saga, Prólogo. Efeitos usam pilha (último a entrar resolve primeiro) e todo dano só é aplicado quando a pilha esvazia.
 - 3 runas por jogador (personagem, campo, retiro). Cada ação exaure ao menos 1 runa.
 - Vitória: ascender, ou ter mais níveis quando a quest do ato 3 termina, resta um vivo, ou o tempo acaba.
+- Níveis por morte de um personagem principal: cada neutro vivo ganha 1; bons e maus que não eram aliados do morto dividem 2 entre os vivos do alinhamento (3 ou mais: ninguém recebe).
+- Quests: principais vêm de um deck da temporada, comum a todos, e duram um número de turnos (se expira, ninguém pontua e o ato muda); side quests ficam no deck de Eventos e precisam ser puxadas por carta.
 
 ## Cartas: decisões de design dos frames
 
@@ -107,4 +109,5 @@ O frame antigo (barra do nome no topo, faixa de tipo, trapézio na base; descrit
 
 1. Levar ao livro de regras: (a) item, campo, retiro e runa também podem ter ato mínimo (o livro, seção 6, ainda diz que só ações travam por ato; o gerador já aceita); (b) a mecânica de moedas: itens com custo em moedas, moedas como fichas de item acessório geradas por cartas (foco na classe Mercador), e "Abra o mercado" para gastar moedas e trazer o item ao jogo (a forma mais comum, não a única; nem todo item tem custo em moedas). Hoje ela só existe nos frames e no gerador.
 2. Identidade visual final.
-3. Fechar os pontos em aberto do livro (seção 15). Cartas de quest: o frame já tem um texto por ato; falta definir no livro as condições, estrelas e inimigos neutros.
+3. Frames de quest: hoje a carta tem um texto por ato (`atos`); com a regra nova, a quest principal precisa mostrar a duração em turnos e falta um frame para side quest. Ver as pendências da seção 15 do livro antes.
+4. Fechar os pontos em aberto do livro (seção 15). Cartas de quest: o frame já tem um texto por ato; falta definir no livro as condições, estrelas e inimigos neutros.
