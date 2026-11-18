@@ -64,6 +64,13 @@ Cada jogador monta dois decks a partir da pool aberta. Os dois juntos, mais o he
 - Side quests têm mais ou menos estrelas conforme o quanto favorecem uma estratégia específica. As quests principais não fazem parte do deck de ninguém e não custam estrelas.
 - Carta de elemento que as suas runas não cobrem não deveria estar no deck.
 
+**Balanceamento**
+
+- O equilíbrio do jogo vem do **custo em estrelas**, não de uma lista de cartas proibidas. Uma carta forte demais tem o custo aumentado; uma fraca demais pode ter o custo reduzido.
+- As estrelas só contam na montagem do deck, então mudar o custo não altera nenhuma regra durante a partida. Pelo limite de cópias da Jornada, subir o custo também pode reduzir quantas cópias são permitidas.
+- Cada **temporada** tem uma **lista oficial de estrelas**, que vale por cima do número impresso na carta.
+- Banir ou reescrever uma carta fica como **último recurso**, para os casos em que nem o custo mais alto a equilibra (por exemplo, uma carta forte demais mesmo com uma cópia só).
+
 **Personagens**
 
 - O personagem principal **custa estrelas**, do mesmo orçamento de 100. O preço reflete o que ele entrega (nível de ascensão, enredo, poder, runa e critérios).
