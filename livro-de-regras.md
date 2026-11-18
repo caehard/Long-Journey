@@ -18,7 +18,7 @@ Os valores fixos do jogo ficam nesta tabela. Cada um é detalhado na seção ind
 | Item | Valor | Seção |
 | --- | --- | --- |
 | Orçamento do deck | 100 estrelas (herói, Jornada e Eventos) | 3 |
-| Cópia extra | 2ª +1, 3ª +2, 4ª +3 estrelas | 3 |
+| Cópias na Jornada | 1 estrela: até 4; 2 estrelas: até 3; 3 estrelas: até 2; 4 ou mais: 1 | 3 |
 | Cartas do Eventos | 1 cópia de cada por deck | 3 |
 | Mão inicial e padrão do Conto | Enredo (padrão 5) | 4, 5 |
 | Runas por jogador | 3 (personagem, campo, retiro) | 6 |
@@ -51,10 +51,17 @@ Cada jogador monta dois decks a partir da pool aberta. Os dois juntos, mais o he
 **Star System**
 
 - Cada carta tem um número de estrelas que indica sua força.
-- Cópias extras de uma carta da Jornada custam estrelas adicionais: 2ª cópia +1, 3ª cópia +2, 4ª cópia +3.
+- Cada cópia custa as estrelas da carta; não há custo adicional por cópia.
+- O número de cópias de uma carta no deck de Jornada depende das estrelas dela:
+
+  | Estrelas da carta | Cópias permitidas |
+  | --- | --- |
+  | 1 | até 4 |
+  | 2 | até 3 |
+  | 3 | até 2 |
+  | 4 ou mais | 1 |
 - Fichas são o único tipo de carta sem estrelas.
 - Side quests têm mais ou menos estrelas conforme o quanto favorecem uma estratégia específica. As quests principais não fazem parte do deck de ninguém e não custam estrelas.
-- Não há teto formal de cópias. O custo progressivo regula.
 - Carta de elemento que as suas runas não cobrem não deveria estar no deck.
 
 **Personagens**
