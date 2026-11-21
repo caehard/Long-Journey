@@ -3,6 +3,7 @@
   "nome": "Lâmina do Crepúsculo",
   "numero": "020",
   "estrelas": 6,
+  "unico": true,
   "ato_minimo": 2,
   "custo_moedas": 4,
   "slot": "arma de 1 mão",

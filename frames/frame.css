@@ -252,50 +252,10 @@
 .frame.tipo-campo .barra-nome, .frame.tipo-retiro .barra-nome { left: 72px; padding-left: 52px; }
 .frame .icone-local-topo { position: absolute; left: 18px; top: 22px; width: 96px; height: 96px; z-index: 2; }
 .frame .icone-local-topo .icone-local { width: 96px; height: 96px; display: block; }
-.frame .icone-local-topo:has(.moldura-avancada) { left: 8px; top: 12px; width: 116px; height: 116px; }
-.frame .icone-local-topo .moldura-avancada { width: 116px; height: 116px; overflow: visible;
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--prata) 55%, transparent)); }
-.frame.tipo-campo .cabecalho:has(~ .icone-local-topo .moldura-avancada) .barra-nome,
-.frame.tipo-retiro .cabecalho:has(~ .icone-local-topo .moldura-avancada) .barra-nome { padding-left: 64px; }
 
-/* ---------- runa: básica só com nome, elemento e arte; avançada com moldura rúnica e caixa ---------- */
+/* ---------- runa: só nome, elemento e arte ---------- */
 
 .frame.tipo-runa .veu { display: none; }
-/* a moldura é maior que o círculo comum, mas o centro do elemento fica no mesmo lugar */
-.frame .circulo-topo:has(.moldura-avancada) { right: 8px; top: -10px; width: 116px; height: 116px; }
-.frame .circulo-topo .moldura-avancada { width: 116px; height: 116px; overflow: visible;
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--prata) 55%, transparent)); }
-.frame .moldura-estrela { stroke-width: 3; stroke-linejoin: round; }
-.frame .moldura-estrela-filete { fill: none; stroke-width: 1; stroke-linejoin: round; opacity: 0.5; }
-.frame .moldura-anel { fill: none; stroke-width: 1.5; opacity: 0.8; }
-.frame .moldura-entalhes path { stroke-width: 2.5; stroke-linecap: round; }
-.frame.tipo-runa .cabecalho:has(.moldura-avancada) .barra-nome { padding-right: 64px; }
-
-.frame .runa-caixa {
-  position: absolute; left: 22px; right: 22px; top: 566px; bottom: 64px;
-  display: flex; flex-direction: column; justify-content: center;
-  padding: 30px 28px 14px; text-align: center;
-  background:
-    radial-gradient(ellipse 70% 60% at 50% 0, color-mix(in srgb, var(--prata) 26%, transparent), transparent 70%),
-    linear-gradient(rgba(9, 10, 14, 0.82), rgba(9, 10, 14, 0.88)),
-    var(--tema-grad);
-  border: 2px solid var(--prata); border-radius: 6px;
-  box-shadow: inset 0 0 0 4px rgba(9, 10, 14, 0.6), inset 0 0 0 5px color-mix(in srgb, var(--prata) 45%, transparent);
-  backdrop-filter: blur(2px);
-}
-.frame .runa-caixa .efeito { flex: 0 1 auto; min-height: 0; overflow: hidden; }
-.frame .runa-caixa .ambientacao { border-top-color: color-mix(in srgb, var(--prata) 45%, transparent); }
-/* rótulo em aba, montado na borda de cima da caixa */
-.frame .runa-rotulo {
-  position: absolute; left: 50%; top: -15px; transform: translateX(-50%);
-  display: flex; align-items: center; gap: 10px; padding: 3px 18px;
-  background: var(--painel-solido); border: 2px solid var(--prata); border-radius: 15px;
-  font-family: "Cinzel", serif; font-weight: 700; font-size: 15px; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--creme); white-space: nowrap;
-}
-.frame .runa-rotulo::before, .frame .runa-rotulo::after {
-  content: ""; width: 6px; height: 6px; background: var(--prata); transform: rotate(45deg);
-}
 
 /* ---------- cantos de baixo, nos chanfros do trapézio: cor do tema escurecida ---------- */
 

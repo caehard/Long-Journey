@@ -7,7 +7,6 @@ Playwright (instale com: python -m playwright install chromium).
 import html
 import re
 import shutil
-from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from markupsafe import Markup

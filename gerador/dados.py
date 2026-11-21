@@ -10,7 +10,7 @@ import re
 import unicodedata
 from pathlib import Path
 
-from .simbolos import PANO_ESTREITO, PANO_LARGO, anexo_classe, anexo_icone, medalhao_solto, anexo_moedas, bandeira, bandeira_personagem, interno_slot, circulo_elementos, estrela_lapidada, linha_moldura, simbolo_quina, circulo_local, circulo_runa_avancada, hexagono_poder, medalhao_slot, moeda_custo, circulo_texto, estandarte, estandarte_duplo, selo_chave, tema
+from .simbolos import PANO_LARGO, anexo_classe, interno_rodadas, medalhao_solto, anexo_moedas, bandeira, bandeira_personagem, interno_slot, circulo_elementos, estrela_lapidada, linha_moldura, simbolo_quina, hexagono_poder, anexo_coroa, moeda_custo, estandarte, estandarte_duplo, selo_chave, tema
 
 RAIZ = Path(__file__).resolve().parent.parent
 FRAMES = RAIZ / "frames"
@@ -34,26 +34,52 @@ CAMPOS_COMUNS = {"tipo", "nome", "estrelas", "numero", "texto", "ambientacao",
                  "arte", "arte_posicao", "arte_zoom", "notas"}
 CAMPOS = {
     "acao": {"ato_minimo", "elementos", "custo_carga", "classes", "classe_dupla", "subtipos"},
-    "personagem": {"ficha", "elemento", "classes", "classe_dupla", "raca", "cla", "funcao", "poder",
-                   "enredo", "frente", "verso"},
-    "item": {"ficha", "slot", "custo_moedas", "ato_minimo"},
-    "campo": {"elemento", "avancado", "ato_minimo"},
-    "retiro": {"elemento", "avancado", "ato_minimo"},
-    "runa": {"elemento", "avancado", "ficha", "ato_minimo"},
-    "quest": {"atos", "recompensa"},
+    "protagonista": {"elemento", "classes", "classe_dupla", "raca", "cla", "funcao", "poder", "enredo",
+                     "frente", "verso"},
+    "personagem": {"unico", "nivel", "elemento", "classes", "classe_dupla", "raca", "cla", "funcao", "poder",
+                   "frente", "verso"},
+    "item": {"unico", "slot", "custo_moedas", "ato_minimo"},
+    "campo": {"elemento", "ato_minimo"},
+    "retiro": {"elemento", "ato_minimo"},
+    "runa": {"elemento"},
+    "quest": {"ato", "recompensa", "ao_revelar"},
+    "ato": {"rodadas"},
 }
 
 # campos que o livro de regras não permite naquele tipo: viram erro, com o motivo
-FICHA_PROIBIDA = "só aliado comum, item comum e runa básica são fichas (livro, seções 6 e 10)"
+FICHA_PROIBIDA = ("não existem fichas: o que um efeito gera vem do seu deck de Eventos; runas, campo e "
+                  "retiro vêm de fora dos decks (livro, seção 3)")
+SEM_AVANCADO = "campos e retiros avançados não existem mais (livro, seção 3)"
 PROIBIDOS = {
     "acao": {"ficha": FICHA_PROIBIDA},
-    "item": {"classes": "classe é impressa só em ações e personagens (livro, glossário)",
+    "protagonista": {"ficha": FICHA_PROIBIDA,
+                     "unico": "Único é subtipo de personagem; o protagonista já é 1 por deck (livro, seção 3)",
+                     "nivel": "nível impresso é só do personagem; o do protagonista é a pontuação na partida (livro, seção 11)"},
+    "personagem": {"ficha": FICHA_PROIBIDA,
+                   "protagonista": 'protagonista é um tipo de carta: use "tipo": "protagonista" (livro, seção 3)',
+                   "enredo": "enredo é do protagonista (livro, seção 5)"},
+    "item": {"ficha": FICHA_PROIBIDA,
+             "classes": "classe é impressa só em ações e personagens (livro, glossário)",
              "classe_dupla": "item não tem classe"},
-    "campo": {"ficha": FICHA_PROIBIDA},
-    "retiro": {"ficha": FICHA_PROIBIDA},
+    "campo": {"ficha": FICHA_PROIBIDA, "avancado": SEM_AVANCADO},
+    "retiro": {"ficha": FICHA_PROIBIDA, "avancado": SEM_AVANCADO},
+    "runa": {"ficha": FICHA_PROIBIDA,
+             "avancado": "não existe runa avançada nem com efeito: só nome e elemento (livro, seção 6)",
+             "texto": "a runa não tem efeito: só nome e elemento (livro, seção 6)",
+             "estrelas": "a runa não custa estrelas (livro, seção 3)",
+             "ato_minimo": "a runa entra em jogo na preparação e não trava por ato (livro, seção 6)"},
     "quest": {"ficha": FICHA_PROIBIDA,
-              "ato": "a pilha de quests é embaralhada; a quest não tem ato fixo (livro, seções 4 e 11)",
-              "niveis": "a quest dá níveis iguais ao ato em que é concluída (livro, seção 11)"},
+              "atos": 'a quest agora tem um ato só, a partir do qual pode ser puxada: use "ato" (1 a 3); '
+                      'o "texto" é o objetivo (livro, seção 11)',
+              "ato_minimo": 'na quest o ato é o campo "ato" (livro, seção 11)',
+              "niveis": 'o que a quest dá vai em "recompensa" (livro, seção 11)'},
+    "ato": {"ficha": FICHA_PROIBIDA,
+            "estrelas": "cartas de Ato são da temporada, fora dos decks, e não custam estrelas (livro, seções 3 e 11)",
+            "ato": "a carta de Ato é o próprio ato; o número dele vem da ordem em que sai (livro, seção 11)",
+            "ato_minimo": "a carta de Ato é o próprio ato; o número dele vem da ordem em que sai (livro, seção 11)",
+            "atos": "a carta de Ato tem um efeito só, no \"texto\" (livro, seção 11)",
+            "turnos": 'a duração do Ato é contada em rodadas: use "rodadas" (livro, seção 11)',
+            "recompensa": "Ato não tem recompensa; recompensa é da quest, no deck de Eventos (livro, seção 11)"},
 }
 CAMPOS_FACE = {"nome", "arte", "arte_posicao", "arte_zoom", "texto", "ambientacao", "poder",
                "classes", "raca", "cla", "funcao",
@@ -186,19 +212,20 @@ def _arte(d, val):
     return url_de(p)
 
 
+SEM_ESTRELAS = {"ato", "runa"}    # cartas de Ato e runas não custam estrelas (livro, seção 3)
+
+
 def _base(d, cfg, val, origem):
     nome = (d.get("nome") or "").strip()
     if not nome:
         val.erro('falta o campo "nome"')
-    ficha = bool(d.get("ficha"))
     estrelas = None
-    if not ficha:
+    if d.get("tipo") not in SEM_ESTRELAS:
         estrelas = val.inteiro(d, "estrelas", 0)
     return {
         "id": origem.stem,
         "tipo": d.get("tipo"),
         "nome": nome,
-        "ficha": ficha,
         "estrelas": estrelas,
         "numero": d.get("numero"),
         "texto": d.get("texto", ""),
@@ -227,17 +254,17 @@ POSICOES_CHAVES = [(0, 0), (52.2, 0), (26.1, 45.4), (78.3, 45.4), (52.2, 90.8)]
 # medidas do frame do personagem (as mesmas de personagem.css), para cortar a moldura
 PJ_NOME_TOPO, PJ_NOME_ALTURA = 505, 54       # barra do nome
 PJ_PANO_DIREITA = 36                         # estandarte: distância da borda direita
-PJ_NOME_TOPO_QUEST = 385                     # na quest o nome sobe para os atos caberem
-# linha de baixo da moldura com os medalhões nela: na runa a estrela vai para o canto esquerdo e a linha
-# desce mais; no campo/retiro os medalhões das quinas param acima do número e da edição
+PJ_NOME_TOPO_QUEST = 385                     # na quest o nome sobe para as caixas caberem
+# linha de baixo da moldura com os medalhões nela: na runa a linha desce mais (a estrela, se houver, e o
+# número ficam no canto de baixo à esquerda); no campo/retiro os medalhões das quinas param acima do número e da edição
 PJ_RUNA_BASE, PJ_LOCAL_BASE = 784, 790
 # runa, campo e retiro: nome centralizado sobre a linha de cima (a linha abre embaixo dele)
 PJ_NOME_CENTRO_TOPO, PJ_NOME_CENTRO_LARG = 0, 330
 # campo e retiro: medalhões nas quinas de baixo da moldura (centro x)
 PJ_QUINA_ESQ, PJ_QUINA_DIR = 80, 550
-# raio visível do medalhão solto (anel simples / estrela rúnica): a linha termina um pouco
-# por dentro dele, para entrar por baixo do anel e o medalhão ficar encaixado na moldura
-PJ_MED_RAIO = {False: 60, True: 70}
+# raio visível do medalhão solto: a linha termina um pouco por dentro dele, para entrar por
+# baixo do anel e o medalhão ficar encaixado na moldura
+PJ_MED_RAIO = 60
 PJ_MED_ENCAIXE = 4
 PJ_CAIXA_ESQ, PJ_CAIXA_TOPO = 234, 700       # caixa de evolução/ascensão (canto de baixo à esquerda)
 PJ_CAIXA_INCL, PJ_CAIXA_ALTURA = 60, 180     # borda esquerda inclinada: 60 px mais para dentro no topo
@@ -262,13 +289,12 @@ def _chaves_no_texto(c, texto, cfg, val):
     c["chaves_pos"] = [(svg, x, y) for svg, (x, y) in zip(selos, POSICOES_CHAVES)]
 
 
-def _raca_e_pano(c, f, unico):
+def _raca_e_pano(c, f, unico, nivel=None):
     """Texto vertical do canto de cima à esquerda (raça; clã e função na linha de dentro, ou a
-    raça sozinha nela) e o estandarte (elemento, coroa de único, classe)."""
+    raça sozinha nela) e o estandarte (elemento, coroa de único, nível do personagem, classe)."""
     c["linhas_raca"] = [x for x in (f.get("raca"), " · ".join(f.get(k) for k in ("cla", "funcao") if f.get(k))) if x]
-    c["bandeira"] = bandeira_personagem(c["elementos_s"], c["classes_s"], unico, c["tema"]["a"])
-    largura_pano = PANO_LARGO if (c["elementos_s"] or unico) else PANO_ESTREITO
-    c["pano_largura"] = largura_pano if c["bandeira"] else None
+    c["bandeira"] = bandeira_personagem(c["elementos_s"], c["classes_s"], unico, c["tema"]["a"], nivel)
+    c["pano_largura"] = PANO_LARGO if c["bandeira"] else None
 
 
 def _cortes_moldura(c):
@@ -285,16 +311,14 @@ def _cortes_moldura(c):
         folga = 18 if c.get("ato_minimo") else 6   # a placa do ato é 12 px mais larga de cada lado
         n0, n1 = 315 - PJ_NOME_CENTRO_LARG / 2 - folga, 315 + PJ_NOME_CENTRO_LARG / 2 + folga
         volta = [(n1, t, False), (d, t, True)]
-        raio = lambda avancado: PJ_MED_RAIO[avancado] - PJ_MED_ENCAIXE
+        r = PJ_MED_RAIO - PJ_MED_ENCAIXE
         if c.get("quinas"):
             # medalhões nas quinas: a lateral desce até encontrar o círculo e a base sai dele
-            rd, re_ = raio(c.get("avancado", False)), raio(c.get("avancado", False))
-            dy_d = math.sqrt(max(rd ** 2 - (d - PJ_QUINA_DIR) ** 2, 0))
-            dy_e = math.sqrt(max(re_ ** 2 - (PJ_QUINA_ESQ - e) ** 2, 0))
-            volta += [(d, b - dy_d, False), QUEBRA, (PJ_QUINA_DIR - rd, b, False),
-                      (PJ_QUINA_ESQ + re_, b, False), QUEBRA, (e, b - dy_e, False)]
+            dy_d = math.sqrt(max(r ** 2 - (d - PJ_QUINA_DIR) ** 2, 0))
+            dy_e = math.sqrt(max(r ** 2 - (PJ_QUINA_ESQ - e) ** 2, 0))
+            volta += [(d, b - dy_d, False), QUEBRA, (PJ_QUINA_DIR - r, b, False),
+                      (PJ_QUINA_ESQ + r, b, False), QUEBRA, (e, b - dy_e, False)]
         else:                # runa: o elemento no centro de baixo
-            r = raio(c.get("avancado", False))
             volta += [(d, b, True), (315 + r, b, False), QUEBRA, (315 - r, b, False), (e, b, True)]
         volta += [(e, t, True), (n0, t, False)]
     else:
@@ -363,36 +387,53 @@ def _acao(d, cfg, val, origem):
     return [("acao", c, "")]
 
 
-def _personagem(d, cfg, val, origem):
-    """Personagem único: duas faces (base e evoluída) e 1 elemento (livro, seções 3, 10 e 12).
-    Ficha = aliado comum: uma face, sem elemento, nível, enredo nem estrelas (livro, seção 10)."""
-    if d.get("ficha"):
-        for k, motivo in (("elemento", "nunca tem elemento"), ("enredo", "enredo é do personagem principal"),
-                          ("frente", "tem uma face só"), ("verso", "tem uma face só")):
-            if k in d:
-                val.erro(f'aliado comum (ficha) não tem "{k}": {motivo} (livro, seção 10)')
-        c = _base(d, cfg, val, origem)
-        _com_classes(c, d, cfg, val)
-        _com_elementos(c, [])
-        c.update(poder=val.inteiro(d, "poder", 0), marca_unico=None,
-                 criterio=None, criterio_rotulo=None, criterio_nivel=None, rodape_extra="aliado comum")
-        c["linha_tipo"] = " · ".join(d.get(k) for k in ("raca", "cla", "funcao") if d.get(k)) or "Aliado comum"
-        c["poder_svg"] = hexagono_poder(c["poder"]) if c["poder"] is not None else None
-        _chaves_no_texto(c, c["texto"], cfg, val)
-        _raca_e_pano(c, d, unico=False)
-        if not d.get("raca"):
-            val.aviso("aliado comum sempre tem raça (livro, seção 10)")
-        return [("personagem", c, "")]
+def _protagonista(d, cfg, val, origem):
+    return _unidade(d, cfg, val, origem, protagonista=True)
 
-    if not isinstance(d.get("frente"), dict) or not isinstance(d.get("verso"), dict):
-        val.erro('personagem único tem duas faces: faltam "frente" e/ou "verso" (livro, seção 12)')
+
+def _personagem(d, cfg, val, origem):
+    return _unidade(d, cfg, val, origem, protagonista=False)
+
+
+def _unidade(d, cfg, val, origem, protagonista):
+    """Protagonista e personagem, dois tipos de carta com o mesmo frame (livro, seções 3, 10 e 12).
+    Os dois têm 1 elemento e a "frente" (forma base). Protagonista (rosto do deck, 1 por jogador,
+    fora dos decks): sempre duas faces, com a ascensão no verso. Personagem (deck de Eventos): o
+    "verso" (forma evoluída) é opcional e nunca tem ascensão; tem "nivel" impresso, fixo, igual
+    nas duas faces (círculo preso ao medalhão, à esquerda); pode ter o subtipo Único (coroa presa
+    ao medalhão, à direita)."""
+    if "unico" in d and not isinstance(d["unico"], bool):
+        val.erro(f'"unico" deve ser true ou false (está {d["unico"]!r})')
+    unico = not protagonista and d.get("unico") is True
+    nivel = None if protagonista else val.inteiro(d, "nivel", 0)
+    if not isinstance(d.get("frente"), dict):
+        val.erro(f'falta a "frente" do {d["tipo"]} (forma base, com poder e texto)')
         return []
+    tem_verso = isinstance(d.get("verso"), dict)
+    if "verso" in d and not tem_verso:
+        val.erro('"verso" deve ser um objeto com a forma evoluída')
+        return []
+    if protagonista and not tem_verso:
+        val.erro('protagonista tem duas faces: falta o "verso" (forma evoluída, com a ascensão) (livro, seção 12)')
+        return []
+    if not protagonista:
+        for k in ("ascensao_nivel", "ascende"):
+            if k in (d.get("verso") or {}):
+                val.erro(f'"{k}" no verso: só o protagonista ascende (livro, seção 12); '
+                         'use "tipo": "protagonista" ou tire o campo')
+        if not tem_verso:
+            for k in ("evolui", "evolui_nivel"):
+                if k in d["frente"]:
+                    val.aviso(f'"{k}" sem "verso": o personagem não tem forma evoluída e a evolução não aparece')
+        elif "evolui_nivel" in d["frente"]:
+            val.aviso('"evolui_nivel" no personagem: o nível dele é o impresso, fixo; se a evolução depende '
+                      'do nível do protagonista, escreva isso em "evolui" (livro, seção 12)')
     if "poder" in d:
         val.aviso('"poder" fica em cada face ("frente" e "verso")')
 
-    marca_unico = dict(simbolo(cfg, "marcas", "unico"), nome="Personagem único")
     faces = []
-    for lado in ("frente", "verso"):
+    lados = ("frente", "verso") if tem_verso else ("frente",)
+    for lado in lados:
         face = d[lado]
         for k in face:
             if k not in CAMPOS_FACE:
@@ -404,68 +445,69 @@ def _personagem(d, cfg, val, origem):
         _com_classes(c, f, cfg, val)
         elementos = _elementos(f, cfg, val, "elemento", 1)
         if not elementos and lado == "frente":
-            val.erro('falta o campo "elemento": o personagem único tem 1 elemento, que gera a runa dele (livro, seção 4)')
+            val.erro('falta o campo "elemento": protagonista e personagem têm 1 elemento (no protagonista gera '
+                     'a runa; no personagem, diz de quais runas saem as cargas que ele perde com dano) (livro, seções 4 e 9)')
         _com_elementos(c, elementos)
         c["poder"] = val.inteiro(f, "poder", 0)
         enredo = val.inteiro(f, "enredo", 0, obrigatorio=False)
-        if lado == "frente" and enredo not in (None, 5):
-            val.aviso(f"enredo {enredo}: todo personagem tem enredo 5 e ele não aparece na carta; "
+        if protagonista and lado == "frente" and enredo not in (None, 5):
+            val.aviso(f"enredo {enredo}: todo protagonista tem enredo 5 e ele não aparece na carta; "
                       "se este muda o enredo, escreva isso no texto")
-        c["marca_unico"] = marca_unico
         c["poder_svg"] = hexagono_poder(c["poder"]) if c["poder"] is not None else None
         _chaves_no_texto(c, c["texto"], cfg, val)
-        _raca_e_pano(c, f, unico=True)
-        c["lado"] = lado
+        _raca_e_pano(c, f, unico, nivel)
+        c["lado"] = lado if tem_verso else ""
 
-        # caixa de evolução/ascensão perto da base: nível mínimo no triângulo + condição
-        if lado == "verso":
+        # caixa perto da base: evolução na frente (se houver verso), ascensão no verso do protagonista.
+        # O nível mínimo (evolui_nivel / ascensao_nivel) é validado, mas não aparece na carta.
+        if lado == "verso" and protagonista:
             n = val.inteiro(f, "ascensao_nivel")
             if isinstance(n, int) and not 6 <= n <= 11:
                 val.aviso(f"ascensao_nivel {n} fora da faixa do livro (6 a 11)")
-            c["criterio_rotulo"], c["criterio"], c["criterio_nivel"] = "Ascensão", f.get("ascende", ""), n
-        else:
-            n = val.inteiro(f, "evolui_nivel", 0, obrigatorio=False)
-            if n is None:
+            c["criterio_rotulo"], c["criterio"], icone = "Ascensão", f.get("ascende", ""), "ascensao"
+        elif lado == "frente" and tem_verso:
+            if val.inteiro(f, "evolui_nivel", 0, obrigatorio=False) is None and protagonista:
                 val.aviso('falta "evolui_nivel" na frente: o nível mínimo para evoluir (livro, seção 12)')
-            c["criterio_rotulo"], c["criterio"], c["criterio_nivel"] = "Evolução", f.get("evolui", ""), n
-        # quina de baixo à direita: ícone de evolução (setas para a direita) ou de ascensão.
-        # O nível mínimo (evolui_nivel / ascensao_nivel) continua validado, mas não aparece na carta.
-        icone = simbolo(cfg, "marcas", "ascensao" if lado == "verso" else "evolucao")["icone_arquivo"]
-        c["quina_svg"] = (simbolo_quina(icone, c["criterio_rotulo"], girar=0 if lado == "verso" else 90)
-                          if icone else None)
-        c["linha_tipo"] = " · ".join(f.get(k) for k in ("raca", "cla", "funcao") if f.get(k)) or "Personagem"
-        c["rodape_extra"] = {"frente": "forma base", "verso": "forma evoluída"}[lado]
-        faces.append(("personagem", c, f"-{lado}"))
+            c["criterio_rotulo"], c["criterio"], icone = "Evolução", f.get("evolui", ""), "evolucao"
+        else:
+            c["criterio_rotulo"], c["criterio"], icone = None, "", None
+        # quina de baixo à direita: ícone de evolução (setas para a direita) ou de ascensão
+        arquivo = simbolo(cfg, "marcas", icone)["icone_arquivo"] if icone else None
+        c["quina_svg"] = simbolo_quina(arquivo, c["criterio_rotulo"], girar=0 if lado == "verso" else 90) if arquivo else None
+        # rodapé: "protagonista" na linha do número (a da edição é cortada pela caixa de ascensão)
+        c["rodape_numero"] = "protagonista" if protagonista else ""
+        c["rodape_extra"] = {"frente": "forma base", "verso": "forma evoluída"}[lado] if tem_verso else ""
+        faces.append((d["tipo"], c, f"-{lado}" if tem_verso else ""))
     return faces
 
 
-def _pano(c, linhas, centro=None, anexo=None, classes=(), avancado=False, detalhe=True,
-          segundo=None, segundo_avancado=False, nome_segundo="", classes_anexo=()):
+def _pano(c, linhas, centro=None, anexo=None, classes=(), detalhe=True, classes_anexo=(),
+          anexo_esq=None, titulo_extra=()):
     """Layout novo (frames/carta.html): texto vertical do canto de cima à esquerda e estandarte."""
     c["linhas_raca"] = [x for x in linhas if x]
     nomes = ([e["nome"] for e in c.get("elementos_s", [])] + [s["nome"] for s in (*classes, *classes_anexo)]
-             + ([nome_segundo] if nome_segundo else []))
+             + list(titulo_extra))
     cor = c["tema"]["a"]
-    c["bandeira"] = bandeira(cor, centro, anexo, classes, avancado, detalhe, " · ".join(nomes),
-                             segundo, segundo_avancado, [anexo_classe(s, cor) for s in classes_anexo])
-    c["pano_largura"] = (PANO_LARGO if centro else PANO_ESTREITO) if c["bandeira"] else None
+    c["bandeira"] = bandeira(cor, centro, anexo, classes, detalhe, " · ".join(nomes),
+                             [anexo_classe(s, cor) for s in classes_anexo], anexo_esq)
+    c["pano_largura"] = PANO_LARGO if c["bandeira"] else None
 
 
 def _layout(c):
     """Completa o que o frame comum (carta.html) usa e cada tipo não preencheu."""
     for k, v in (("linhas_raca", []), ("bandeira", None), ("pano_largura", None), ("poder_svg", None),
-                 ("chaves_pos", []), ("criterio_rotulo", None), ("quina_svg", None), ("atos", None),
-                 ("recompensa", ""), ("lado", ""), ("sem_texto", False), ("ato_minimo", None),
+                 ("chaves_pos", []), ("criterio_rotulo", None), ("quina_svg", None), ("caixas", None),
+                 ("lado", ""), ("sem_texto", False), ("ato_minimo", None),
                  ("medalhoes_base", []), ("nome_centro", False), ("quinas", False)):
         c.setdefault(k, v)
-    # só o personagem único tem a estrela embaixo à esquerda; nos outros ela fica no centro
-    # (e a runa, para a linha de baixo poder descer com o elemento no centro)
-    c["base_centro"] = not (c["tipo"] == "personagem" and not c["ficha"]) and c["tipo"] not in ("runa", "campo", "retiro")
+    # protagonista ou personagem com caixa de evolução/ascensão: estrela embaixo à esquerda; nos
+    # outros ela fica no centro (e a runa, para a linha de baixo poder descer com o elemento no centro)
+    c["base_centro"] = not c["criterio_rotulo"] and c["tipo"] not in ("runa", "campo", "retiro")
     # campo e retiro: os medalhões ocupam as quinas, então estrela e número ficam juntos no centro
     c["base_grupo"] = c["tipo"] in ("campo", "retiro")
     _cortes_moldura(c)
     c["estrela_svg"] = (estrela_lapidada(c["estrelas"], f"{c['id']}{c['lado']}")
-                        if c.get("estrelas") is not None and not c["ficha"] else None)
+                        if c.get("estrelas") else None)
 
 
 def _item(d, cfg, val, origem):
@@ -477,97 +519,98 @@ def _item(d, cfg, val, origem):
         slots = _simbolos(d, cfg, val, "slot", "slots", restrito=True)
         c["slot_s"] = slots[0] if slots else simbolo(cfg, "slots", d["slot"])
     _com_elementos(c, [])
+    if "unico" in d and not isinstance(d["unico"], bool):
+        val.erro(f'"unico" deve ser true ou false (está {d["unico"]!r})')
+    unico = d.get("unico") is True
     c["ato_minimo"] = val.inteiro(d, "ato_minimo", 1, 3, obrigatorio=False)
     # custo em moedas (comprar no mercado) no lugar dos elementos; sem custo, sem círculo,
     # porque o item também pode entrar em jogo por outros efeitos
     c["custo_moedas"] = val.inteiro(d, "custo_moedas", 0, obrigatorio=False)
     c["circulo"] = moeda_custo(c["custo_moedas"]) if c["custo_moedas"] is not None else ""
-    c["medalhao"] = medalhao_slot(c["slot_s"], lendario=not c["ficha"])
-    # estandarte: o slot no medalhão (comum, sem os detalhes), o custo em moedas preso a ele
-    _pano(c, ["Item comum" if c["ficha"] else "Item", c["slot_s"]["nome"]],
+    # estandarte: o slot no medalhão; a coroa de Único embaixo à direita, como no personagem, e o
+    # custo em moedas embaixo à esquerda
+    _pano(c, ["Item", c["slot_s"]["nome"]],
           interno_slot(c["slot_s"], c["tema"]["a"]),
-          anexo_moedas(c["custo_moedas"]) if c["custo_moedas"] is not None else None,
-          detalhe=not c["ficha"])
+          anexo_coroa() if unico else None,
+          detalhe=True,
+          anexo_esq=anexo_moedas(c["custo_moedas"]) if c["custo_moedas"] is not None else None,
+          titulo_extra=["item único"] if unico else [])
     return [("item", c, "")]
 
 
 def _local(d, cfg, val, origem):
+    """Campo de batalha, retiro e runa, os três fora dos decks (livro, seções 3 e 6). A runa é um
+    tipo de carta só com nome e elemento: sem efeito e sem estrelas."""
     c = _base(d, cfg, val, origem)
     elementos = _elementos(d, cfg, val, "elemento", 1)
     if not elementos:
         val.erro('falta o campo "elemento" (campo, retiro e runa sempre fornecem uma runa)')
     _com_elementos(c, elementos)
-    c["ato_minimo"] = val.inteiro(d, "ato_minimo", 1, 3, obrigatorio=False)
-    c["avancado"] = bool(d.get("avancado"))
-    c["linha_tipo"] = f'{NOMES_LOCAL[d["tipo"]]} · {"Avançado" if c["avancado"] else "Básico"}'
     if d["tipo"] == "runa":
-        c["linha_tipo"] = c["linha_tipo"].replace("Avançado", "Avançada").replace("Básico", "Básica")
-        if not c["avancado"] and not c["ficha"]:
-            val.erro('runa básica é sempre ficha (livro, seção 6): use "ficha": true, ou marque "avancado"')
-        if c["avancado"] and c["ficha"]:
-            val.erro("runa avançada vem do deck de Eventos e não é ficha (livro, seção 6)")
-        # avançada: moldura rúnica em volta do elemento (no lugar do "Av") e caixa de texto;
-        # básica: só nome, elemento e arte
-        if c["avancado"]:
-            c["circulo"] = circulo_runa_avancada(elementos)
-            if not c["texto"].strip():
-                val.aviso("runa avançada sem texto: o efeito dela vai na caixa de texto")
-        elif c["texto"].strip() or c["ambientacao"].strip():
-            val.aviso("runa básica não tem caixa de texto: texto e ambientação não aparecem")
-        if not c["avancado"]:
-            c["sem_texto"] = True
+        if c["ambientacao"].strip():
+            val.aviso("a runa não tem caixa de texto: a ambientação não aparece")
+        c["sem_texto"] = True
         # sem estandarte e sem texto vertical: o nome fica centralizado no topo e o elemento no
-        # centro de baixo, sobre a linha da moldura; a estrela rúnica em volta diz "avançada"
+        # centro de baixo, sobre a linha da moldura
         c["nome_centro"] = True
         c["nome_topo"] = PJ_NOME_CENTRO_TOPO
         c["medalhoes_base"] = [(medalhao_solto(
-            circulo_elementos(elementos), c["tema"]["a"], c["avancado"],
-            " · ".join([e["nome"] for e in elementos] + (["runa avançada"] if c["avancado"] else ["runa básica"]))),
-            315, PJ_RUNA_BASE)]
+            circulo_elementos(elementos), c["tema"]["a"],
+            " · ".join([e["nome"] for e in elementos] + ["runa"])), 315, PJ_RUNA_BASE)]
         c["base_y"] = PJ_RUNA_BASE
         return [("runa", c, "")]
+    c["ato_minimo"] = val.inteiro(d, "ato_minimo", 1, 3, obrigatorio=False)
     # o design da runa: sem estandarte nem texto vertical, nome centralizado no topo; nas quinas de
-    # baixo da moldura, o ícone do tipo (esquerda) e o elemento (direita), os dois com a estrela
-    # rúnica se for avançado
+    # baixo da moldura, o ícone do tipo (esquerda) e o elemento (direita)
     icone = dict(simbolo(cfg, "locais", d["tipo"]), nome=NOMES_LOCAL[d["tipo"]])
     cor = c["tema"]["a"]
     c["nome_centro"] = True
     c["nome_topo"] = PJ_NOME_CENTRO_TOPO
     c["quinas"] = True
     c["medalhoes_base"] = [
-        (medalhao_solto(interno_slot(icone, cor), cor, c["avancado"],
-                        icone["nome"] + (" avançado" if c["avancado"] else " básico")), PJ_QUINA_ESQ, PJ_LOCAL_BASE),
-        (medalhao_solto(circulo_elementos(elementos), cor, c["avancado"],
-                        " · ".join(e["nome"] for e in elementos)), PJ_QUINA_DIR, PJ_LOCAL_BASE),
+        (medalhao_solto(interno_slot(icone, cor), cor, icone["nome"]), PJ_QUINA_ESQ, PJ_LOCAL_BASE),
+        (medalhao_solto(circulo_elementos(elementos), cor, " · ".join(e["nome"] for e in elementos)),
+         PJ_QUINA_DIR, PJ_LOCAL_BASE),
     ]
     c["base_y"] = PJ_LOCAL_BASE
     return [("local", c, "")]
 
 
 def _quest(d, cfg, val, origem):
-    """Quest: um texto (condição de conclusão, inimigo neutro...) para cada ato, porque a pilha
-    é embaralhada e a mesma quest pode sair no ato I, II ou III (livro, seções 4 e 11)."""
+    """Quest (deck de Eventos): o ato a partir do qual pode ser puxada (o pentágono ao lado do
+    nome), o objetivo ("texto"), a recompensa e, se houver, o efeito ao ser revelada
+    ("ao_revelar"), cada um numa caixa com rótulo no lugar do texto (livro, seção 11)."""
     c = _base(d, cfg, val, origem)
-    atos = d.get("atos")
-    if not isinstance(atos, list) or not all(isinstance(t, str) for t in atos) or len(atos) > 3:
-        val.erro('"atos" deve ser uma lista com o texto de cada ato: ["ato I", "ato II", "ato III"]')
-        atos = []
-    atos = (atos + ["", "", ""])[:3]
-    for n, t in enumerate(atos, 1):
-        if not t.strip():
-            val.aviso(f"falta o texto do ato {ROMANOS[n]}")
-    if d.get("texto"):
-        val.aviso('na quest o texto vai em "atos" (um por ato); "texto" não aparece na carta')
-    c["atos"] = atos
-    c["recompensa"] = (d.get("recompensa") or "").strip()  # opcional: os atos encolhem para ela caber
+    c["ato_minimo"] = val.inteiro(d, "ato", 1, 3)
+    objetivo, recompensa, revelar = ((d.get(k) or "").strip() for k in ("texto", "recompensa", "ao_revelar"))
+    if not objetivo:
+        val.erro('falta o "texto": o objetivo da quest (livro, seção 11)')
+    if not recompensa:
+        val.erro('falta a "recompensa" (livro, seção 11)')
+    c["caixas"] = ([("Ao ser revelada", revelar, "")] if revelar else []) + [
+        ("Objetivo", objetivo, "principal"), ("Recompensa", recompensa, "destaque")]
+    c["sem_texto"] = True
     _com_elementos(c, [])
-    c["nome_topo"] = PJ_NOME_TOPO_QUEST  # nome mais alto, para os 3 atos caberem embaixo
+    c["nome_topo"] = PJ_NOME_TOPO_QUEST  # nome mais alto, para as caixas caberem embaixo
     _pano(c, ["Quest"])
     return [("quest", c, "")]
 
 
-TIPOS = {"acao": _acao, "personagem": _personagem, "item": _item,
-         "campo": _local, "retiro": _local, "runa": _local, "quest": _quest}
+def _ato(d, cfg, val, origem):
+    """Carta de Ato (deck da temporada, fora dos decks dos jogadores; 3 sorteadas por partida):
+    nome, rodadas que dura (no medalhão do estandarte) e o efeito enquanto durar ("texto"). Sem
+    estrelas e sem número: ela é o próprio ato, e o número vem da ordem (livro, seções 4 e 11)."""
+    c = _base(d, cfg, val, origem)
+    rodadas = val.inteiro(d, "rodadas", 1)
+    if not (c["texto"] or "").strip():
+        val.aviso('falta o "texto": o efeito que vale enquanto o ato durar')
+    _com_elementos(c, [])
+    _pano(c, ["Ato"], interno_rodadas("?" if rodadas is None else rodadas))
+    return [("ato", c, "")]
+
+
+TIPOS = {"acao": _acao, "protagonista": _protagonista, "personagem": _personagem, "item": _item,
+         "campo": _local, "retiro": _local, "runa": _local, "quest": _quest, "ato": _ato}
 
 
 def ler_carta(caminho, cfg):
@@ -615,7 +658,8 @@ def ler_dados(d, origem, cfg):
     for _, c, _ in faces:
         _estandartes(c)
         _layout(c)
-        c["rotulo_numero"] = f'{c["numero"]} / {total}' if c.get("numero") else ""
+        c["rotulo_numero"] = " · ".join(x for x in (f'{c["numero"]} / {total}' if c.get("numero") else "",
+                                                    c.get("rodape_numero", "")) if x)
         c["rotulo_edicao"] = " · ".join(x for x in (edicao, c.get("rodape_extra")) if x)
     # todos os tipos usam o frame comum (frames/carta.html); os templates antigos estão em frames/antigo/
     faces = [("carta", c, sufixo) for _, c, sufixo in faces]
@@ -630,31 +674,38 @@ MODELOS = {
         "elementos": ["mana"], "custo_carga": 0, "classes": [], "subtipos": ["ataque"],
         "texto": "", "ambientacao": "", "arte": "",
     },
-    "personagem": {
-        "tipo": "personagem", "nome": "", "numero": "", "estrelas": 10, "elemento": "mana",
-        "classes": [], "raca": "", "cla": "", "funcao": "",
+    "protagonista": {
+        "tipo": "protagonista", "nome": "", "numero": "", "estrelas": 10,
+        "elemento": "mana", "classes": [], "raca": "", "cla": "", "funcao": "",
         "frente": {"poder": 2, "texto": "", "evolui_nivel": 3, "evolui": "", "arte": ""},
         "verso": {"nome": "", "poder": 3, "ascensao_nivel": 8, "texto": "", "ascende": "", "arte": ""},
     },
+    "personagem": {
+        "tipo": "personagem", "nome": "", "numero": "", "estrelas": 4, "nivel": 1, "unico": False,
+        "elemento": "mana", "classes": [], "raca": "", "cla": "", "funcao": "",
+        "frente": {"poder": 2, "texto": "", "arte": ""},
+    },
     "item": {
-        "tipo": "item", "nome": "", "numero": "", "estrelas": 5, "custo_moedas": 3,
+        "tipo": "item", "nome": "", "numero": "", "estrelas": 5, "unico": False, "custo_moedas": 3,
         "slot": "arma de 1 mão",
         "texto": "", "ambientacao": "", "arte": "",
     },
     "campo": {
         "tipo": "campo", "nome": "", "numero": "", "estrelas": 3, "elemento": "mana",
-        "avancado": False, "texto": "", "ambientacao": "", "arte": "",
+        "texto": "", "ambientacao": "", "arte": "",
     },
     "retiro": {
         "tipo": "retiro", "nome": "", "numero": "", "estrelas": 3, "elemento": "gaia",
-        "avancado": False, "texto": "", "ambientacao": "", "arte": "",
+        "texto": "", "ambientacao": "", "arte": "",
     },
     "runa": {
-        "tipo": "runa", "nome": "", "numero": "", "estrelas": 4, "elemento": "mana",
-        "avancado": True, "texto": "", "ambientacao": "", "arte": "",
+        "tipo": "runa", "nome": "", "numero": "", "elemento": "mana", "arte": "",
     },
     "quest": {
-        "tipo": "quest", "nome": "", "numero": "", "estrelas": 2,
-        "atos": ["", "", ""], "arte": "",
+        "tipo": "quest", "nome": "", "numero": "", "estrelas": 2, "ato": 1,
+        "texto": "", "recompensa": "", "ao_revelar": "", "arte": "",
+    },
+    "ato": {
+        "tipo": "ato", "nome": "", "numero": "", "rodadas": 6, "texto": "", "arte": "",
     },
 }

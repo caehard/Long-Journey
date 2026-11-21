@@ -1,3 +1,6 @@
 Templates do frame antigo (barra do nome no topo, faixa de tipo, trapézio na base), guardados
 quando todos os tipos passaram para o layout do personagem (frames/carta.html). Não são usados
 pelo gerador; para voltar a eles, mova de volta para frames/ e troque o template em dados.ler_dados.
+Na v0.6 saíram as versões avançadas de runa, campo e retiro: runa.html e local.html ainda têm os
+trechos avançados, que dependiam de funções já removidas de simbolos.py (moldura_avancada,
+circulo_runa_avancada, circulo_local).

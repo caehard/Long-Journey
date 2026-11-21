@@ -3,10 +3,8 @@
   "nome": "O Despertar do Dragão",
   "numero": "040",
   "estrelas": 2,
-  "atos": [
-    "Invoque um **Filhote de Dragão** (neutro, poder 3) no campo de batalha. Quem der o golpe final completa a quest.",
-    "Invoque um **Dragão Jovem** (neutro, poder 6, Escudo 1) no campo de batalha. Quem der o golpe final completa a quest.",
-    "Invoque o **Dragão Ancião** (neutro, poder 8, Escudo 2, Espinhos 1) no campo de batalha. Quem der o golpe final completa a quest."
-  ],
-  "recompensa": "Quem completar esta quest puxa um **item lendário** do seu deck de Eventos."
+  "ato": 2,
+  "ao_revelar": "Puxe o **Dragão Jovem** do seu deck de Eventos, como inimigo neutro, na região do seu campo de batalha. Ele ataca a unidade mais próxima no fim de cada rodada.",
+  "texto": "Dê o golpe final no Dragão Jovem.",
+  "recompensa": "Ganhe **2 níveis** e puxe um **item único** do seu deck de Eventos."
 }

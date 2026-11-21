@@ -1,0 +1,23 @@
+{
+  "tipo": "personagem",
+  "nome": "Brena, Guarda do Portão",
+  "numero": "",
+  "estrelas": 5,
+  "nivel": 3,
+  "unico": true,
+  "elemento": "divino",
+  "classes": [
+    "guardiao"
+  ],
+  "raca": "Humana",
+  "frente": {
+    "poder": 2,
+    "texto": "Interceptar.",
+    "evolui": "Ter interceptado 2 ataques."
+  },
+  "verso": {
+    "nome": "Brena, Capitã da Guarda",
+    "poder": 3,
+    "texto": "Interceptar. Escudo 1."
+  }
+}

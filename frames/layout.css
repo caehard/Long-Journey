@@ -154,12 +154,12 @@
   color: rgba(239, 230, 210, 0.75); text-shadow: 0 1px 2px #000;
 }
 .pj:not(.com-caixa) .pj-base { right: 40px; }
-/* fora do personagem único: estrela centralizada embaixo, número à esquerda e edição à direita */
+/* fora do personagem com caixa: estrela centralizada embaixo, número à esquerda e edição à direita */
 .pj .pj-base.pj-base-centro {
   left: 40px; right: 40px;
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
 }
-.pj-base-centro > .estrela-lapidada, .pj-base-centro > .ficha-marca { grid-column: 2; grid-row: 1; }
+.pj-base-centro > .estrela-lapidada { grid-column: 2; grid-row: 1; }
 .pj-base-centro .pj-rodape { display: contents; }
 .pj-base-centro .pj-rodape > span { grid-row: 1; font-size: 12px; font-weight: 700;
   color: rgba(239, 230, 210, 0.75); text-shadow: 0 1px 2px #000; }
@@ -169,7 +169,7 @@
 /* ---------- runa: elemento embaixo, no centro, sobre a linha da moldura ---------- */
 .pj-medalhao-base { position: absolute; transform: translate(-50%, -50%); width: 160px; height: 160px; z-index: 3; }
 .pj-medalhao-base .pj-medalhao-solto { width: 160px; height: 160px; }
-/* runa avançada, campo e retiro: o texto fica entre a arte e os medalhões de baixo */
+/* campo e retiro: o texto fica entre a arte e os medalhões de baixo */
 .pj.tipo-runa .pj-texto { top: 470px; bottom: 180px; }
 .pj.tipo-campo .pj-texto, .pj.tipo-retiro .pj-texto { top: 470px; bottom: 174px; }
 /* campo e retiro: estrela e número juntos no centro, entre os medalhões das quinas */
@@ -193,32 +193,23 @@
   border-left: 3px solid var(--prata); border-radius: 4px;
 }
 
-/* ---------- estandarte avançado: estrela rúnica no lugar do anel ---------- */
-.pj-bandeira .pano-estrela { stroke-width: 3; stroke-linejoin: round; }
-.pj-bandeira .pano-estrela-filete { fill: none; stroke-width: 1; stroke-linejoin: round; opacity: 0.5; }
-
-/* ---------- quest: os 3 atos no lugar do texto ---------- */
-.pj-atos {
+/* ---------- quest: caixas com rótulo (ao ser revelada, objetivo, recompensa) no lugar do texto ---------- */
+.pj-caixas {
   position: absolute; left: 34px; right: 34px; bottom: 108px;
-  display: flex; flex-direction: column; gap: 10px;
+  display: flex; flex-direction: column; gap: 12px;
 }
-.pj-ato, .pj-recompensa {
-  position: relative; min-height: 0;
+.pj-caixinha {
+  position: relative; min-height: 0; flex: 2 1 0; padding: 24px 14px 8px;
   background: rgba(11, 13, 19, 0.72); backdrop-filter: blur(2px);
   border: 2px solid var(--prata); border-radius: 4px;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
-.pj-ato { flex: 1 1 0; display: flex; align-items: center; padding: 6px 14px 6px 56px; }
-.pj .pj-ato .ato-pent { left: -10px; top: 50%; transform: translateY(-50%); width: 58px; height: 50px; }
-.pj-ato .efeito { font-size: 18px; line-height: 1.22; max-height: 100%; }
-.pj-recompensa {
-  flex: 0 0 100px; padding: 24px 14px 8px;
-  background: linear-gradient(rgba(9, 10, 14, 0.78), rgba(9, 10, 14, 0.86)), var(--tema-grad);
-}
-.pj-recompensa-rotulo {
+.pj-caixinha.principal { flex-grow: 3; }
+.pj-caixinha.destaque { background: linear-gradient(rgba(9, 10, 14, 0.78), rgba(9, 10, 14, 0.86)), var(--tema-grad); }
+.pj-caixinha-rotulo {
   position: absolute; left: 14px; top: 5px; display: flex; align-items: center; gap: 8px;
   font-family: "Cinzel", serif; font-weight: 700; font-size: 13px; letter-spacing: 2px;
   text-transform: uppercase; color: var(--prata);
 }
-.pj-recompensa-rotulo::before { content: ""; width: 6px; height: 6px; background: var(--prata); transform: rotate(45deg); }
-.pj-recompensa .efeito { font-size: 17px; height: 100%; }
+.pj-caixinha-rotulo::before { content: ""; width: 6px; height: 6px; background: var(--prata); transform: rotate(45deg); }
+.pj-caixinha .efeito { font-size: 18px; line-height: 1.22; height: 100%; }

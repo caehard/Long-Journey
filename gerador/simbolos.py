@@ -133,60 +133,6 @@ def circulo_elementos(elementos, custo=None, classe="elementos"):
                   f'<title>{titulo}</title>{"".join(partes)}</svg>')
 
 
-def _estrela_pontas(n, r_ext, r_int, centro=60):
-    pts = []
-    for i in range(2 * n):
-        x, y = _ponto(90 + i * 180 / n, r_ext if i % 2 == 0 else r_int)
-        pts.append(f"{_f(x - 50 + centro)},{_f(y - 50 + centro)}")
-    return " ".join(pts)
-
-
-def moldura_avancada(interno, cor, titulo, classe="elementos"):
-    """Moldura rúnica de carta avançada em volta de um círculo de 100 x 100 (elemento da runa,
-    ícone do campo ou do retiro): estrela de 8 pontas na cor do elemento, anel fino e entalhes
-    entre as pontas. viewBox 120 x 120 com o círculo no centro, no mesmo tamanho do comum."""
-    entalhes = []
-    for i in range(8):
-        a = 90 + 22.5 + i * 45
-        x0, y0 = _ponto(a, 49)
-        x1, y1 = _ponto(a, 53)
-        entalhes.append(f'<path d="M{_f(x0 + 10)} {_f(y0 + 10)} L{_f(x1 + 10)} {_f(y1 + 10)}"/>')
-    return Markup(
-        f'<svg class="{classe} moldura-avancada" viewBox="0 0 120 120" role="img" aria-label="{titulo}">'
-        f'<title>{titulo}</title>'
-        f'<polygon class="moldura-estrela" points="{_estrela_pontas(8, 57, 47)}" fill="{FUNDO}" stroke="{cor}"/>'
-        f'<polygon class="moldura-estrela-filete" points="{_estrela_pontas(8, 52.5, 47.5)}" stroke="{cor}"/>'
-        f'<circle class="moldura-anel" cx="60" cy="60" r="51" stroke="{cor}"/>'
-        f'<g class="moldura-entalhes" stroke="{cor}">{"".join(entalhes)}</g>'
-        f'<svg x="10" y="10" width="100" height="100" viewBox="0 0 100 100">{interno}</svg></svg>')
-
-
-def circulo_runa_avancada(elementos):
-    """Runa avançada: o círculo de elementos dentro da moldura rúnica."""
-    cor = elementos[0]["cor"] if elementos else PRATA
-    titulo = " / ".join(e["nome"] for e in elementos) + " · runa avançada"
-    return moldura_avancada(circulo_elementos(elementos), cor, titulo)
-
-
-def circulo_local(s, cor, avancado):
-    """Campo de batalha e retiro: ícone do tipo (frames/icones/locais/) num círculo com o anel
-    na cor do elemento, à esquerda da barra do nome; avançado, dentro da moldura rúnica."""
-    caminho = s.get("icone_arquivo")
-    if caminho and caminho.suffix == ".svg":
-        glifo = re.search(r"<svg[^>]*>(.*)</svg>", _svg_do_arquivo(str(caminho), caminho.stat().st_mtime), re.S).group(1)
-    else:
-        glifo = (f'<text x="50" y="52" text-anchor="middle" dominant-baseline="central" '
-                 f'font-family="Source Sans 3, sans-serif" font-weight="700" font-size="34" fill="#efe6d2">{s["sigla"]}</text>')
-    circulo = (f'<circle cx="50" cy="50" r="{R_ANEL + TRACO_ANEL / 2}" fill="{FUNDO}"/>'
-               f'<circle cx="50" cy="50" r="{R_ANEL}" fill="none" stroke="{cor}" stroke-width="{TRACO_ANEL}"/>'
-               f'<g transform="translate(50 50) scale(0.66) translate(-50 -50)">{glifo}</g>')
-    titulo = s["nome"] + (" · avançado" if avancado else "")
-    if avancado:
-        return moldura_avancada(circulo, cor, titulo, classe="icone-local")
-    return Markup(f'<svg class="icone-local" viewBox="0 0 100 100" role="img" aria-label="{titulo}">'
-                  f'<title>{titulo}</title>{circulo}</svg>')
-
-
 def circulo_texto(texto, rotulo, classe="elementos"):
     """Círculo prateado com um texto curto no centro (slot do item, níveis da quest)."""
     tam = 44 if len(str(texto)) <= 2 else 34
@@ -278,7 +224,8 @@ def moeda_custo(valor):
 
 def medalhao_slot(s, lendario):
     """Item: um único medalhão no centro da carta diz tudo. Glifo do slot no meio; lendário com
-    contorno duplo, losangos nos pontos cardeais e halo; comum (ficha) com um anel simples."""
+    contorno duplo, losangos nos pontos cardeais e halo; sem lendario, um anel simples (sem uso desde
+    que o item comum, que era ficha, deixou de existir)."""
     caminho = s.get("icone_arquivo")
     if caminho and caminho.suffix == ".svg":
         glifo = re.search(r"<svg[^>]*>(.*)</svg>", _svg_do_arquivo(str(caminho), caminho.stat().st_mtime), re.S).group(1)
@@ -401,14 +348,13 @@ def estandarte_duplo(a, b, cor=PRATA):
 # ---------- estandarte (todas as cartas) ----------
 # Pendurado no canto de cima à direita, desce do topo da carta (o pano sobe pela sangria).
 # No alto, centralizado, o medalhão (círculo de elementos, ou o slot do item) com anel externo,
-# entalhes e losangos; avançado (campo, retiro, runa), com a estrela rúnica no lugar do anel.
+# entalhes e losangos.
 # Um círculo menor fica preso ao medalhão, embaixo à direita e por trás dele (coroa de único,
-# ato da ação, ícone de campo/retiro, custo em moedas). Abaixo, a classe centralizada direto no
-# pano; com 2 ou mais, menores, lado a lado. Sem medalhão (aliado comum): estandarte estreito
-# só com a(s) classe(s), empilhadas.
+# classe da ação, custo em moedas). Abaixo, a classe centralizada direto no pano; com 2 ou mais,
+# menores, lado a lado.
 
 COROA_ICONE = Path(__file__).resolve().parent.parent / "frames" / "icones" / "marcas" / "unico.svg"
-PANO_LARGO, PANO_ESTREITO = 180, 120   # larguras do estandarte (dados.py corta a moldura por elas)
+PANO_LARGO = 180   # largura do estandarte (dados.py corta a moldura por ela)
 
 
 def _glifo_classe_em(s, cor, x, y, escala):
@@ -427,42 +373,30 @@ def _classes_no_pano(classes, cor, cx, cy, k):
     return "".join(_glifo_classe_em(s, cor, x0 + i * passo, cy, k2) for i, s in enumerate(classes))
 
 
-def _medalhao(interno, cor, cx, cy, avancado=False, detalhe=True):
+def _medalhao(interno, cor, cx, cy, detalhe=True):
     """Medalhão do estandarte: o conteúdo (SVG de 100 x 100) maior, num disco escuro. Com detalhe,
-    anel externo fino, entalhes e 4 losangos; avançado, a estrela rúnica de 8 pontas no lugar."""
+    anel externo fino, entalhes e 4 losangos."""
     r_ext = 60
-    partes = []
-    if avancado:
-        def estrela(r1, r2):
-            pts = []
-            for i in range(16):
-                x, y = _ponto(90 + i * 22.5, r1 if i % 2 == 0 else r2)
-                pts.append(f"{_f(x - 50 + cx)},{_f(y - 50 + cy)}")
-            return " ".join(pts)
-        partes.append(f'<polygon class="pano-estrela" points="{estrela(74, 60)}" fill="{FUNDO}" stroke="{cor}"/>'
-                      f'<polygon class="pano-estrela-filete" points="{estrela(68, 60)}" stroke="{cor}"/>'
-                      f'<circle class="pano-anel-fino" cx="{cx}" cy="{cy}" r="{r_ext}" stroke="{cor}"/>')
-    else:
-        partes.append(f'<circle cx="{cx}" cy="{cy}" r="{r_ext + 2}" fill="{FUNDO}"/>')
-        if detalhe:
-            entalhes = []
-            for i in range(24):
-                if i % 6 == 0:
-                    continue  # nos pontos cardeais ficam os losangos
-                x0, y0 = _ponto(90 + i * 15, 54.5)
-                x1, y1 = _ponto(90 + i * 15, 58)
-                entalhes.append(f'M{_f(x0 - 50 + cx)} {_f(y0 - 50 + cy)} L{_f(x1 - 50 + cx)} {_f(y1 - 50 + cy)}')
-            partes.append(f'<circle class="pano-anel-fino" cx="{cx}" cy="{cy}" r="{r_ext}" stroke="{cor}"/>'
-                          f'<path class="pano-entalhes" d="{" ".join(entalhes)}" stroke="{cor}"/>')
-            for a in (90, 0, 270, 180):
-                x, y = _ponto(a, r_ext)
-                x, y = x - 50 + cx, y - 50 + cy
-                partes.append(f'<polygon class="pano-losango" points="{_f(x)},{_f(y - 6)} {_f(x + 5)},{_f(y)} '
-                              f'{_f(x)},{_f(y + 6)} {_f(x - 5)},{_f(y)}" fill="{cor}"/>')
+    partes = [f'<circle cx="{cx}" cy="{cy}" r="{r_ext + 2}" fill="{FUNDO}"/>']
+    if detalhe:
+        entalhes = []
+        for i in range(24):
+            if i % 6 == 0:
+                continue  # nos pontos cardeais ficam os losangos
+            x0, y0 = _ponto(90 + i * 15, 54.5)
+            x1, y1 = _ponto(90 + i * 15, 58)
+            entalhes.append(f'M{_f(x0 - 50 + cx)} {_f(y0 - 50 + cy)} L{_f(x1 - 50 + cx)} {_f(y1 - 50 + cy)}')
+        partes.append(f'<circle class="pano-anel-fino" cx="{cx}" cy="{cy}" r="{r_ext}" stroke="{cor}"/>'
+                      f'<path class="pano-entalhes" d="{" ".join(entalhes)}" stroke="{cor}"/>')
+        for a in (90, 0, 270, 180):
+            x, y = _ponto(a, r_ext)
+            x, y = x - 50 + cx, y - 50 + cy
+            partes.append(f'<polygon class="pano-losango" points="{_f(x)},{_f(y - 6)} {_f(x + 5)},{_f(y)} '
+                          f'{_f(x)},{_f(y + 6)} {_f(x - 5)},{_f(y)}" fill="{cor}"/>')
     tam = 112
     partes.append(f'<svg x="{_f(cx - tam / 2)}" y="{_f(cy - tam / 2)}" width="{tam}" height="{tam}" viewBox="0 0 100 100">'
                   f'{interno}</svg>')
-    if detalhe and not avancado:
+    if detalhe:
         partes.append(f'<circle class="pano-filete" cx="{cx}" cy="{cy}" r="40" stroke="{cor}"/>')
     return "".join(partes)
 
@@ -491,6 +425,24 @@ def anexo_ato(ato):
 
 
 ROMANO_ANEXO = {1: "I", 2: "II", 3: "III"}
+
+
+def interno_rodadas(rodadas):
+    """Conteúdo do medalhão da carta de Ato: quantas rodadas ela dura, com o rótulo embaixo."""
+    texto = str(rodadas)
+    tam = 50 if len(texto) == 1 else 40
+    return (f'<text x="50" y="45" text-anchor="middle" dominant-baseline="central" font-family="Cinzel, serif" '
+            f'font-weight="700" font-size="{tam}" fill="#efe6d2">{texto}</text>'
+            f'<text x="50" y="74" text-anchor="middle" dominant-baseline="central" font-family="Cinzel, serif" '
+            f'font-weight="700" font-size="11" letter-spacing="1" fill="#efe6d2">RODADAS</text>')
+
+
+def anexo_nivel(nivel):
+    """Nível impresso do personagem, em algarismos, no círculo preso ao medalhão."""
+    texto = str(nivel)
+    tam = 60 if len(texto) == 1 else 46
+    return (f'<text x="50" y="54" text-anchor="middle" dominant-baseline="central" font-family="Cinzel, serif" '
+            f'font-weight="700" font-size="{tam}" fill="#efe6d2">{texto}</text>')
 
 
 def anexo_icone(s):
@@ -531,42 +483,26 @@ def interno_slot(s, cor):
             f'<circle cx="50" cy="50" r="{R_ANEL}" fill="none" stroke="{cor}" stroke-width="{TRACO_ANEL}"/>{glifo}')
 
 
-def bandeira(cor, centro=None, anexo=None, classes=(), avancado=False, detalhe=True, titulo="",
-             segundo=None, segundo_avancado=False, anexos=()):
-    """SVG do estandarte (Markup), ou None se não houver nada para pendurar nele.
-    centro: SVG de 100 x 100 do medalhão; anexo: SVG de 100 x 100 do círculo preso a ele;
-    segundo: SVG de 100 x 100 de um segundo medalhão, do mesmo tamanho, separado embaixo do
-    primeiro (campo/retiro: o ícone do tipo, menos importante que o elemento; segundo_avancado
-    põe nele a estrela rúnica)."""
-    partes = []
-    if centro:
-        largura = PANO_LARGO
-        cx, cy = largura / 2, 92
-        if anexo:
-            partes.append(_anexo(anexo, cor, cx, cy))
-        # vários círculos presos (classes da ação): simétricos, um de cada lado
-        for conteudo, ang in zip(anexos, ANGULOS_ANEXOS.get(len(anexos), ANGULOS_ANEXOS[3])):
-            partes.append(_anexo(conteudo, cor, cx, cy, ang))
-        partes.append(_medalhao(centro, cor, cx, cy, avancado, detalhe))
-        fim = 266 if classes else 196   # onde as laterais do pano terminam e começa a ponta
-        if segundo:
-            r1, r2 = (74 if avancado else 62), (74 if segundo_avancado else 62)
-            cy2 = cy + r1 + 20 + r2
-            partes.append(_medalhao(segundo, cor, cx, cy2, segundo_avancado, detalhe))
-            fim = cy2 + r2 + 18
-        if classes:
-            partes.append(_classes_no_pano(classes, cor, cx, 222, 1.4))
-    elif classes:  # sem medalhão (aliado comum): estandarte estreito, classes empilhadas
-        largura = PANO_ESTREITO
-        if len(classes) == 1:
-            fim = 160
-            partes.append(_glifo_classe_em(classes[0], cor, largura / 2, 86, 1.5))
-        else:
-            passo, k = 86, 1.15
-            fim = 66 + passo * (len(classes) - 1) + 50
-            partes += [_glifo_classe_em(s, cor, largura / 2, 66 + i * passo, k) for i, s in enumerate(classes)]
-    else:
+def bandeira(cor, centro=None, anexo=None, classes=(), detalhe=True, titulo="", anexos=(), anexo_esq=None):
+    """SVG do estandarte (Markup), ou None se não houver medalhão para pendurar nele.
+    centro: SVG de 100 x 100 do medalhão; anexo: SVG de 100 x 100 do círculo preso a ele
+    (embaixo à direita); anexo_esq: o mesmo, embaixo à esquerda (nível do personagem);
+    anexos: vários círculos presos (classes da ação), simétricos."""
+    if not centro:
         return None
+    largura = PANO_LARGO
+    cx, cy = largura / 2, 92
+    partes = []
+    if anexo:
+        partes.append(_anexo(anexo, cor, cx, cy))
+    if anexo_esq:
+        partes.append(_anexo(anexo_esq, cor, cx, cy, 135))
+    for conteudo, ang in zip(anexos, ANGULOS_ANEXOS.get(len(anexos), ANGULOS_ANEXOS[3])):
+        partes.append(_anexo(conteudo, cor, cx, cy, ang))
+    partes.append(_medalhao(centro, cor, cx, cy, detalhe))
+    fim = 266 if classes else 196   # onde as laterais do pano terminam e começa a ponta
+    if classes:
+        partes.append(_classes_no_pano(classes, cor, cx, 222, 1.4))
     meio, ponta = largura / 2, fim + largura / 3
     pano = f"M0 -40 H{largura} V{fim} L{_f(meio)} {_f(ponta)} L0 {fim} Z"
     return Markup(
@@ -575,22 +511,26 @@ def bandeira(cor, centro=None, anexo=None, classes=(), avancado=False, detalhe=T
         f'<path class="pano" d="{pano}" stroke="{cor}"/>{"".join(partes)}</svg>')
 
 
-def medalhao_solto(interno, cor, avancado, titulo=""):
-    """O medalhão do estandarte sozinho (runa: o elemento, embaixo no centro da carta);
-    avançado com a estrela rúnica em volta, que é o que diz que a runa é avançada."""
+def medalhao_solto(interno, cor, titulo=""):
+    """O medalhão do estandarte sozinho (runa: o elemento, embaixo no centro da carta; campo e
+    retiro: o ícone do tipo e o elemento, nas quinas de baixo)."""
     return Markup(
         f'<svg class="pj-bandeira pj-medalhao-solto" viewBox="0 0 160 160" width="160" height="160" '
         f'role="img" aria-label="{titulo}"><title>{titulo}</title>'
-        f'{_medalhao(interno, cor, 80, 80, avancado, True)}</svg>')
+        f'{_medalhao(interno, cor, 80, 80, True)}</svg>')
 
 
-def bandeira_personagem(elementos, classes, unico, cor):
-    nomes = [e["nome"] for e in elementos] + (["personagem único"] if unico else []) + [s["nome"] for s in classes]
+def bandeira_personagem(elementos, classes, unico, cor, nivel=None):
+    """Estandarte do protagonista e do personagem: elemento no medalhão, coroa de Único embaixo à
+    direita, nível do personagem embaixo à esquerda (o protagonista não tem nível impresso)."""
+    nomes = ([e["nome"] for e in elementos] + ([f"nível {nivel}"] if nivel is not None else [])
+             + (["personagem único"] if unico else []) + [s["nome"] for s in classes])
     return bandeira(cor, circulo_elementos(elementos) if elementos else None,
-                    anexo_coroa() if unico else None, classes, titulo=" · ".join(nomes))
+                    anexo_coroa() if unico else None, classes, titulo=" · ".join(nomes),
+                    anexo_esq=anexo_nivel(nivel) if nivel is not None else None)
 
 
-# ---------- gemas lapidadas (personagem): estrela do custo e triângulo do nível ----------
+# ---------- gemas lapidadas: estrela do custo ----------
 # Mesmo detalhamento do hexágono de poder: uma faceta por aresta, sombreada pela direção
 # da luz (de cima à esquerda), mesa central lisa com o valor, luz na mesa, reflexo, filete
 # e contorno escuro. Pontos de cada forma no sentido horário na tela.

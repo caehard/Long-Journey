@@ -12,7 +12,7 @@ Uso:
   python gerar.py nova acao "Bola de Fogo"   cria cards/bola-de-fogo.json a partir do modelo
   python gerar.py validar                    só confere os JSON, sem gerar imagens
 
-Tipos para "nova": acao, personagem, item, campo, retiro, runa, quest.
+Tipos para "nova": acao, protagonista, personagem, item, campo, retiro, runa, quest, ato.
 """
 
 import argparse
@@ -122,11 +122,12 @@ def nova(tipo, nome):
     carta = json.loads(json.dumps(MODELOS[tipo]))
     carta["nome"] = nome
     carta["arte"] = f"arte/{slug(nome)}.png"
-    if tipo == "personagem":
+    if tipo in ("protagonista", "personagem"):
         carta.pop("arte")
         carta["frente"]["arte"] = f"arte/{slug(nome)}.png"
-        carta["verso"]["arte"] = f"arte/{slug(nome)}-evoluido.png"
-        carta["verso"]["nome"] = nome
+        if "verso" in carta:
+            carta["verso"]["arte"] = f"arte/{slug(nome)}-evoluido.png"
+            carta["verso"]["nome"] = nome
     CARTAS.mkdir(exist_ok=True)
     destino.write_text(json.dumps(carta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Criado {_rel(destino)}. Preencha os campos e rode: python gerar.py {_rel(destino).as_posix()}")

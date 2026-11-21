@@ -5,7 +5,6 @@
   "estrelas": 4,
   "ato_minimo": 2,
   "elemento": "gaia",
-  "avancado": true,
-  "texto": "No seu Hiato, seus aliados únicos no retiro descartam 1 dano.",
+  "texto": "Suas unidades no retiro têm **Escudo 1**.",
   "ambientacao": "Quem entra não é visto. Quem sai já não é o mesmo."
 }

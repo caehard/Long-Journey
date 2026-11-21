@@ -1,0 +1,8 @@
+{
+  "tipo": "ato",
+  "nome": "Ventos de Guerra",
+  "numero": "",
+  "rodadas": 6,
+  "texto": "A primeira ação de **mover** de cada jogador, em cada turno, não exaure quem move.",
+  "ambientacao": "Os estandartes se erguem por todo o reino."
+}
