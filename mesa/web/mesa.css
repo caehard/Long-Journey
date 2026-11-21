@@ -1,0 +1,88 @@
+@font-face { font-family: "Cinzel"; src: url("/frames/fontes/Cinzel.ttf"); font-weight: 400 900; }
+@font-face { font-family: "Source Sans 3"; src: url("/frames/fontes/SourceSans3.ttf"); font-weight: 200 900; }
+
+:root {
+  --fundo: #171a24; --fundo-2: #12151e; --painel: #1f2433; --painel-2: #262c3d; --linha: #343b50;
+  --prata: #c3c9d4; --prata-clara: #eef0f4; --creme: #efe6d2; --cinza: #9aa0b4;
+  --erro: #ff7a7a; --aviso: #f0c062; --ok: #7fd18b;
+  --carta-l: 84px; --carta-a: 117px;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--fundo); color: var(--creme); font: 15px/1.4 "Source Sans 3", system-ui, sans-serif; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--prata-clara); }
+h1, h2, h3 { font-family: "Cinzel", serif; color: var(--prata-clara); letter-spacing: 1px; margin: 0; }
+
+header.topo {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 8px 16px; background: var(--painel); border-bottom: 1px solid var(--linha);
+}
+header.topo h1 { font-size: 19px; margin-right: 8px; }
+header.topo nav a { font-size: 13px; color: var(--cinza); text-decoration: none; margin-right: 10px; }
+header.topo nav a:hover, header.topo nav a.ativo { color: var(--prata-clara); }
+.espaco { flex: 1; }
+
+.botao {
+  background: var(--painel-2); border: 1px solid var(--linha); border-radius: 8px;
+  padding: 6px 12px; cursor: pointer; white-space: nowrap;
+}
+.botao:hover { border-color: var(--prata); }
+.botao.principal { background: var(--prata); border-color: var(--prata); color: #15181f; font-weight: 700; }
+.botao.principal:hover { background: var(--prata-clara); }
+.botao.pequeno { padding: 2px 8px; font-size: 13px; border-radius: 6px; }
+.botao:disabled { opacity: .45; cursor: default; }
+select, input[type=text], input[type=number] {
+  background: var(--fundo-2); border: 1px solid var(--linha); border-radius: 8px; padding: 6px 10px;
+}
+select:focus, input:focus { outline: none; border-color: var(--prata); }
+.dica { font-size: 12px; color: var(--cinza); }
+.erro { color: var(--erro); }
+.aviso { color: var(--aviso); }
+.ok { color: var(--ok); }
+
+/* cartas */
+.carta-img { display: block; width: 100%; height: 100%; border-radius: 5px; object-fit: cover; }
+.verso-carta {
+  width: 100%; height: 100%; border-radius: 5px; border: 2px solid #3a4260;
+  background: radial-gradient(circle at 50% 45%, #2d3552 0, #171b2a 70%);
+  display: flex; align-items: center; justify-content: center;
+  font: 700 13px "Cinzel", serif; color: #6c7698; letter-spacing: 2px; text-align: center;
+}
+
+/* zoom ao passar o mouse */
+#zoom {
+  position: fixed; z-index: 50; width: 315px; height: 440px; pointer-events: none; display: none;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, .7));
+}
+#zoom img { width: 100%; height: 100%; border-radius: 12px; }
+
+/* avisos rápidos */
+#avisos { position: fixed; right: 16px; bottom: 16px; z-index: 60; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  background: var(--painel-2); border: 1px solid var(--linha); border-left: 4px solid var(--prata);
+  border-radius: 8px; padding: 8px 12px; max-width: 360px; font-size: 14px; box-shadow: 0 6px 20px rgba(0,0,0,.4);
+}
+.toast.erro { border-left-color: var(--erro); color: var(--creme); }
+.toast.ok { border-left-color: var(--ok); }
+
+/* menu de contexto */
+.menu {
+  position: fixed; z-index: 70; min-width: 200px; background: var(--painel-2); border: 1px solid var(--linha);
+  border-radius: 8px; padding: 4px; box-shadow: 0 10px 30px rgba(0,0,0,.5); font-size: 14px;
+}
+.menu .titulo { padding: 4px 10px 6px; font: 700 12px "Cinzel", serif; color: var(--cinza); letter-spacing: 1px; }
+.menu button { display: block; width: 100%; text-align: left; background: none; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+.menu button:hover { background: var(--linha); }
+.menu .sub { position: relative; }
+.menu .sub > button::after { content: "▸"; float: right; color: var(--cinza); }
+.menu .sub > .menu { display: none; position: absolute; left: 100%; top: -4px; }
+.menu .sub:hover > .menu { display: block; }
+.menu hr { border: none; border-top: 1px solid var(--linha); margin: 4px 2px; }
+
+/* janela (lista de cartas de uma pilha) */
+.fundo-modal { position: fixed; inset: 0; background: rgba(8, 10, 16, .7); z-index: 40; display: flex; align-items: center; justify-content: center; }
+.modal { background: var(--painel); border: 1px solid var(--linha); border-radius: 12px; width: min(1100px, 94vw); max-height: 86vh; display: flex; flex-direction: column; }
+.modal header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--linha); }
+.modal .conteudo { overflow: auto; padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 10px; }
+.modal .conteudo .carta { --carta-l: 126px; --carta-a: 176px; }

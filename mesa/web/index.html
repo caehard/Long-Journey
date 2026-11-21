@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mesa Long Journey</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/web/mesa.css">
+<style>
+  main { max-width: 900px; margin: 0 auto; padding: 40px 16px; }
+  .entradas { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 28px 0; }
+  .entrada { display: block; background: var(--painel); border: 1px solid var(--linha); border-radius: 12px; padding: 20px; text-decoration: none; color: var(--creme); }
+  .entrada:hover { border-color: var(--prata); }
+  .entrada h2 { font-size: 20px; margin-bottom: 8px; }
+  .entrada p { margin: 0; color: var(--cinza); }
+  #situacao { background: var(--painel); border: 1px solid var(--linha); border-radius: 12px; padding: 14px 18px; }
+  #situacao ul { margin: 6px 0 0; padding-left: 18px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Mesa Long Journey</h1>
+  <p class="dica">Mesa virtual para testar o jogo. Ela não aplica as regras: os jogadores movem as cartas, como numa mesa de verdade.</p>
+  <div class="entradas">
+    <a class="entrada" href="/decks"><h2>Deckbuilder</h2><p>Monte e confira decks com as regras de construção (100 estrelas, cópias, runas).</p></a>
+    <a class="entrada" href="/jogo"><h2>Partida</h2><p>Sente à mesa com um deck e jogue com outros jogadores, cada um no seu navegador.</p></a>
+  </div>
+  <div id="situacao">Carregando o acervo…</div>
+</main>
+<script src="/web/comum.js"></script>
+<script>
+async function mostrar() {
+  await Acervo.carregar();
+  const cartas = Object.values(Acervo.cartas);
+  const comErro = cartas.filter(c => c.erros && c.erros.length);
+  const porTipo = {};
+  for (const c of cartas) if (!c.erros?.length) porTipo[c.tipo] = (porTipo[c.tipo] || 0) + 1;
+  $("#situacao").replaceChildren(
+    el("strong", {}, `Acervo: ${cartas.length - comErro.length} carta(s) prontas`),
+    el("div", { class: "dica" }, Object.entries(porTipo).map(([t, n]) => `${NOME_TIPO[t] || t}: ${n}`).join(" · ")),
+    el("div", { class: "dica" }, "Cada carta salva em cards/ (pelo criador ou à mão) entra aqui sozinha em poucos segundos."),
+    Acervo.erro ? el("div", { class: "erro" }, `Erro ao atualizar o acervo: ${Acervo.erro}`) : null,
+    comErro.length ? el("div", { class: "erro" }, `Com erro (fora do acervo):`,
+      el("ul", {}, ...comErro.map(c => el("li", {}, `${c.arquivo}: ${c.erros[0]}`)))) : null);
+}
+mostrar();
+ouvirMudancas("", d => acompanharAcervo(d.acervo, mostrar));
+</script>
+</body>
+</html>

@@ -4,6 +4,8 @@ Uso: python app.py [--porta 8765] [--sem-navegador]  (abre http://localhost:8765
 
 Usa o mesmo código do gerador: a pré-visualização é o template real preenchido
 pelo gerador/dados.py, e "Exportar" roda o gerar.py de verdade.
+
+Ao salvar, avisa a mesa (python mesa.py, porta 8766), que põe a carta no acervo na hora.
 """
 
 import json
@@ -12,6 +14,7 @@ import re
 import subprocess
 import sys
 import threading
+import urllib.request
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -25,6 +28,7 @@ dados.URL_BASE = "/raiz/"  # o navegador busca fontes, ícones e artes por este 
 from gerador.render import Renderizador  # noqa: E402
 
 PORTA = 8765
+MESA = "http://127.0.0.1:8766"  # servidor da mesa (mesa.py); se estiver fechado, a carta entra quando ele abrir
 APP = RAIZ / "app"
 ARTE = RAIZ / "arte"
 SAIDA = RAIZ / "out"
@@ -100,6 +104,17 @@ def listar_cartas():
         except Exception:
             saida.append({"arquivo": p.name, "nome": "(JSON inválido)", "tipo": ""})
     return saida
+
+
+def avisar_mesa():
+    """Pede à mesa para conferir o acervo agora. Devolve se a mesa está aberta."""
+    try:
+        pedido = urllib.request.Request(MESA + "/api/acervo/sincronizar", data=b"{}", method="POST",
+                                        headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(pedido, timeout=0.5):
+            return True
+    except OSError:
+        return False
 
 
 def exportar(arquivo, pdf=False):
@@ -183,7 +198,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 caminho = _arquivo_de_carta(arquivo)
                 CARTAS.mkdir(exist_ok=True)
                 caminho.write_text(json.dumps(carta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-                return self._json({"arquivo": caminho.name})
+                return self._json({"arquivo": caminho.name, "mesa": avisar_mesa(), "mesa_url": MESA})
             if url.path == "/api/exportar":
                 return self._json(exportar(pedido["arquivo"], pedido.get("pdf", False)))
         except Exception as e:

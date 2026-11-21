@@ -1,0 +1,9 @@
+{
+  "nome": "Exemplo: Aria",
+  "protagonista": "exemplo-protagonista",
+  "campo": "exemplo-campo",
+  "retiro": "exemplo-retiro",
+  "runas": ["runa-alma", "runa-caos", "runa-gaia"],
+  "jornada": {"exemplo-acao": 2, "exemplo-reacao": 1},
+  "eventos": {"exemplo-personagem": 1, "exemplo-personagem-unico": 1, "exemplo-item": 1, "exemplo-quest": 3}
+}

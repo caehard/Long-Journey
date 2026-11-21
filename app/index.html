@@ -118,6 +118,7 @@
   <select id="novo-tipo" title="Tipo da nova carta"></select>
   <button class="botao" id="nova">Nova</button>
   <span class="espaco"></span>
+  <a class="estado" id="link-mesa" href="http://localhost:8766/decks" target="_blank" rel="noopener" title="Deckbuilder e partida (python mesa.py)">Mesa ↗</a>
   <span class="estado" id="estado">nova carta</span>
   <button class="botao" id="salvar" title="Ctrl+S">Salvar</button>
   <button class="botao principal" id="exportar">Exportar PNG</button>
@@ -149,8 +150,8 @@
 const $ = s => document.querySelector(s);
 const estado = { cfg: null, carta: {}, arquivo: null, sujo: false, timer: null, pedido: 0, chaveForm: "" };
 const DICA_CHAVES = "Palavras-chave vão no texto (ex.: Escudo 2. Distante.); as que têm ícone aparecem sozinhas na carta.";
-const NOMES_TIPO = { acao: "Ação", personagem: "Personagem", item: "Item lendário", campo: "Campo de batalha",
-                     retiro: "Retiro", runa: "Runa", quest: "Quest" };
+const NOMES_TIPO = { acao: "Ação", protagonista: "Protagonista", personagem: "Personagem", item: "Item", campo: "Campo de batalha",
+                     retiro: "Retiro", runa: "Runa", quest: "Quest", ato: "Ato" };
 
 async function api(caminho, corpo) {
   const r = await fetch(caminho, corpo === undefined ? {} : {
@@ -303,7 +304,7 @@ function separarDupla(base = "") {
 }
 
 
-// arte de um objeto (a carta, ou a frente/verso do personagem)
+// arte de um objeto (a carta, ou a frente/verso do protagonista ou personagem)
 function arte(base = "") {
   const s = el("select", { class: "arte-controle" });
   const encher = () => {
@@ -378,15 +379,12 @@ const secao = (titulo, ...filhos) => el("fieldset", {}, el("legend", {}, titulo)
 
 // ---------- formulário de cada tipo ----------
 
-// ficha: null (o tipo não pode ser ficha) ou { rotulo, aoMudar }
-function secaoCarta(ficha = null) {
-  const estrelas = numero("estrelas", "Estrelas", { vazio: 0 });
-  aoAtualizar(() => { estrelas.hidden = !!ler("ficha"); });
+// semEstrelas: carta de Ato e runa
+function secaoCarta({ semEstrelas = false } = {}) {
+  const estrelas = semEstrelas ? el("div") : numero("estrelas", "Estrelas", { vazio: 0 });
   return secao("Carta",
     texto("nome", "Nome"),
-    linha(texto("numero", "Número", { ph: "001" }), estrelas),
-    ficha ? check("ficha", ficha.rotulo, { aoMudar: ficha.aoMudar }) : null,
-    ficha ? el("div", { class: "dica" }, "Fichas não têm estrelas (livro, seção 3).") : null);
+    linha(texto("numero", "Número", { ph: "001" }), estrelas));
 }
 const secaoTexto = (efeito = "Efeito", extra = null) => secao("Texto",
   area("texto", efeito, { dica: "**negrito**, *itálico*; cada linha vira um parágrafo.", linhas: 5 }),
@@ -406,46 +404,12 @@ const FORMULARIOS = {
     secao("Arte", arte()),
   ],
 
-  personagem: () => {
-    const fichaOpcao = { rotulo: "Aliado comum (ficha): uma face, sem elemento, nível nem enredo", aoMudar: virarAliadoComum };
-    if (estado.carta.ficha) {
-      return [secaoCarta(fichaOpcao),
-        secao("Aliado comum",
-          ...classes(),
-          linha(texto("raca", "Raça"), texto("cla", "Clã"), texto("funcao", "Função")),
-          linha(numero("poder", "Poder"), el("div"))),
-        secaoTexto(), secao("Arte", arte())];
-    }
-    return [secaoCarta(fichaOpcao),
-      secao("Personagem",
-        fichas("elemento", "Elemento", "elementos", { unico: true, dica: "(1; gera a runa dele e define a cor)" }),
-        ...classes(),
-        linha(texto("raca", "Raça"), texto("cla", "Clã"), texto("funcao", "Função"))),
-      ...abas({
-        frente: ["Frente", [
-          secao("Forma base",
-            linha(numero("frente.poder", "Poder"), el("div")),
-            area("frente.texto", "Efeito", { linhas: 4, dica: DICA_CHAVES })),
-          secao("Evolução",
-            linha(numero("frente.evolui_nivel", "Nível mínimo", { ph: "no triângulo" }), el("div")),
-            area("frente.evolui", "Condição para evoluir", { linhas: 2 })),
-          secao("Arte da frente", arte("frente."))]],
-        verso: ["Verso", [
-          secao("Forma evoluída",
-            texto("verso.nome", "Nome"),
-            linha(numero("verso.poder", "Poder"), el("div")),
-            area("verso.texto", "Efeito", { linhas: 4, dica: DICA_CHAVES })),
-          secao("Ascensão",
-            linha(numero("verso.ascensao_nivel", "Nível mínimo", { ph: "6 a 11" }), el("div")),
-            area("verso.ascende", "Condição para ascender", { linhas: 2 })),
-          secao("Arte do verso", arte("verso."))]],
-      }),
-    ];
-  },
-
+  protagonista: () => formularioUnidade(true),
+  personagem: () => formularioUnidade(false),
   item: () => [
-    secaoCarta({ rotulo: "Item comum (ficha)" }),
-    secao(estado.carta.ficha ? "Item comum" : "Item lendário",
+    secaoCarta(),
+    secao("Item",
+      check("unico", "Único (não se puxa outro com este nome na partida)"),
       ato("ato_minimo", "Ato mínimo", { opcional: true }),
       selecao("slot", "Slot", estado.cfg.slots.map(s => [s.nome, s.nome])),
       linha(numero("custo_moedas", "Custo em moedas", { ph: "sem custo" }), el("div")),
@@ -454,63 +418,104 @@ const FORMULARIOS = {
     secao("Arte", arte()),
   ],
 
-  local: () => [
-    secaoCarta(),
-    secao(NOMES_TIPO[estado.carta.tipo] || "Local",
-      selecao("tipo", "Tipo", [["campo", "Campo de batalha"], ["retiro", "Retiro"], ["runa", "Runa"]], { aoMudar: ajustarRuna }),
-      fichas("elemento", "Elemento", "elementos", { unico: true, dica: "(obrigatório; a runa que a carta fornece)" }),
-      ato("ato_minimo", "Ato mínimo", { opcional: true }),
-      check("avancado", "Avançado (entra por cima de um básico seu)", { aoMudar: v => { gravar("avancado", v || undefined); ajustarRuna(); } }),
-      estado.carta.tipo === "runa" ? el("div", { class: "dica" }, "Runa básica é sempre ficha, gerada na preparação; só a avançada vem do deck de Eventos (livro, seção 6). A básica é só nome, elemento e arte; a avançada ganha a moldura rúnica e a caixa de texto.") : null),
-    ...(estado.carta.tipo === "runa" && !estado.carta.avancado ? [] : [secaoTexto()]),
-    secao("Arte", arte()),
-  ],
+  local: () => {
+    const runa = estado.carta.tipo === "runa";
+    return [
+      secaoCarta({ semEstrelas: runa }),
+      secao(NOMES_TIPO[estado.carta.tipo] || "Local",
+        selecao("tipo", "Tipo", [["campo", "Campo de batalha"], ["retiro", "Retiro"], ["runa", "Runa"]], { aoMudar: ajustarRuna }),
+        fichas("elemento", "Elemento", "elementos", { unico: true, dica: "(obrigatório; a runa que a carta fornece)" }),
+        runa ? el("div", { class: "dica" }, "Fora dos decks, como campo e retiro. Só nome e elemento: sem efeito e sem estrelas (livro, seção 6).")
+          : ato("ato_minimo", "Ato mínimo", { opcional: true })),
+      ...(runa ? [] : [secaoTexto()]),
+      secao("Arte", arte()),
+    ];
+  },
 
   quest: () => [
     secaoCarta(),
-    el("div", { class: "dica", style: "margin: -8px 0 14px" },
-      "A pilha de quests é embaralhada: a mesma quest pode sair em qualquer ato. Escreva a condição de cada um (fica mais difícil a cada ato)."),
-    secao("Atos",
-      area("atos.0", "Ato I", { linhas: 3 }),
-      area("atos.1", "Ato II", { linhas: 3 }),
-      area("atos.2", "Ato III", { linhas: 3, dica: "**negrito**, *itálico*; cada linha vira um parágrafo." })),
-    secao("Recompensa adicional",
-      area("recompensa", "Recompensa (opcional)", { linhas: 2, dica: "Se houver, os atos encolhem e a caixa da recompensa aparece embaixo." })),
+    secao("Quest",
+      el("div", { class: "dica" }, "Fica no deck de Eventos e só pode ser puxada a partir do ato dela; só quem a puxou pode completá-la. Se cria um inimigo, ele vem do seu deck de Eventos: escreva qual é, onde surge e como age (livro, seção 11)."),
+      ato("ato", "Ato"),
+      area("ao_revelar", "Ao ser revelada (opcional)", { linhas: 2 }),
+      area("texto", "Objetivo", { linhas: 3 }),
+      area("recompensa", "Recompensa", { linhas: 2, dica: "**negrito**, *itálico*; cada linha vira um parágrafo." })),
+    secao("Arte", arte()),
+  ],
+
+  ato: () => [
+    secaoCarta({ semEstrelas: true }),
+    secao("Ato",
+      el("div", { class: "dica" }, "Carta da temporada: 3 são sorteadas por partida, uma para cada ato, na ordem em que saem. Efeito fixo, igual em qualquer ato; sem estrelas nem número de ato. As rodadas contam a partir da 2ª rodada do jogo (livro, seção 11)."),
+      linha(numero("rodadas", "Rodadas", { min: 1 }), el("div"))),
+    secaoTexto("Efeito enquanto durar"),
     secao("Arte", arte()),
   ],
 };
 const grupo = tipo => ["campo", "retiro", "runa"].includes(tipo) ? "local" : tipo;
 
-// personagem único (duas faces) <-> aliado comum (ficha, uma face, sem elemento/enredo/estrelas)
-const CAMPOS_FACE = ["poder", "texto", "arte", "arte_posicao", "arte_zoom"];
-function virarAliadoComum(ligar) {
+// protagonista e personagem: o mesmo frame. O protagonista sempre tem verso (com ascensão);
+// o personagem tem verso só se tiver forma evoluída, e nunca ascensão
+function formularioUnidade(protagonista) {
   const c = estado.carta;
-  if (ligar) {
-    for (const k of CAMPOS_FACE) if (c.frente && k in c.frente) c[k] = c.frente[k];
-    for (const k of ["frente", "verso", "elemento", "enredo", "estrelas"]) delete c[k];
-    c.ficha = true;
-  } else {
-    c.frente = {};
-    for (const k of CAMPOS_FACE) if (k in c) { c.frente[k] = c[k]; delete c[k]; }
-    c.frente.poder ??= 0;
-    c.frente.evolui_nivel ??= 3;
-    c.frente.evolui ??= "";
-    c.verso = { nome: c.nome || "", poder: c.frente.poder, ascensao_nivel: 8, texto: "", ascende: "" };
-    c.estrelas = 0;
-    delete c.ficha;
-  }
+  const frente = [
+    secao("Forma base",
+      linha(numero("frente.poder", "Poder"), el("div")),
+      area("frente.texto", "Efeito", { linhas: 4, dica: DICA_CHAVES })),
+    c.verso ? secao("Evolução",
+      protagonista ? linha(numero("frente.evolui_nivel", "Nível mínimo", { ph: "não aparece na carta" }), el("div")) : null,
+      area("frente.evolui", "Condição para evoluir", { linhas: 2, dica: protagonista ? "" : "O nível do personagem é fixo; se a evolução depende do nível do protagonista, escreva isso aqui." })) : null,
+    secao(c.verso ? "Arte da frente" : "Arte", arte("frente."))].filter(Boolean);
+  return [secaoCarta(),
+    secao(protagonista ? "Protagonista" : "Personagem",
+      protagonista ? el("div", { class: "dica" }, "Rosto do deck: 1 por jogador, fora dos decks. Duas faces, com a ascensão no verso (livro, seções 3 e 12).") : null,
+      protagonista ? null : linha(numero("nivel", "Nível", { ph: "força; limita quem o puxa" }), el("div")),
+      protagonista ? null : check("unico", "Único (não se puxa outro com este nome na partida, nem um com o nome do seu protagonista)"),
+      protagonista ? null : check("verso", "Tem forma evoluída (verso, sem ascensão)", { aoMudar: ligarVerso }),
+      fichas("elemento", "Elemento", "elementos", { unico: true, dica: protagonista ? "(1; gera a runa dele e define a cor)" : "(1; as runas de onde saem as cargas que ele perde; define a cor)" }),
+      ...classes(),
+      linha(texto("raca", "Raça"), texto("cla", "Clã"), texto("funcao", "Função"))),
+    ...(!c.verso ? frente : abas({
+      frente: ["Frente", frente],
+      verso: ["Verso", [
+        secao("Forma evoluída",
+          texto("verso.nome", "Nome"),
+          linha(numero("verso.poder", "Poder"), el("div")),
+          area("verso.texto", "Efeito", { linhas: 4, dica: DICA_CHAVES })),
+        protagonista ? secao("Ascensão",
+          linha(numero("verso.ascensao_nivel", "Nível mínimo", { ph: "6 a 11" }), el("div")),
+          area("verso.ascende", "Condição para ascender", { linhas: 2 })) : null,
+        secao("Arte do verso", arte("verso."))]],
+    })),
+  ];
 }
 
-// runa: básica é ficha, avançada não; campo e retiro nunca são ficha
+// personagem: liga ou desliga a forma evoluída (verso) e a caixa de evolução da frente
+function ligarVerso(ligar) {
+  const c = estado.carta;
+  c.frente ??= { poder: 0, texto: "" };
+  if (ligar) {
+    c.frente.evolui ??= "";
+    c.verso ??= { nome: c.nome || "", poder: c.frente.poder ?? 0, texto: "" };
+  } else {
+    delete c.verso;
+    delete c.frente.evolui_nivel;
+    delete c.frente.evolui;
+  }
+}
+// runa: só nome e elemento (sem estrelas, texto nem ato); campo e retiro sempre custam estrelas
 function ajustarRuna() {
   const c = estado.carta;
-  if (c.tipo === "runa" && !c.avancado) { c.ficha = true; delete c.estrelas; }
-  else { delete c.ficha; c.estrelas ??= 0; }
+  delete c.avancado;
+  delete c.ficha;
+  if (c.tipo === "runa") { for (const k of ["ato_minimo", "estrelas", "texto", "ambientacao"]) delete c[k]; }
+  else c.estrelas ??= 0;
 }
 
 function montarFormulario() {
   const tipo = grupo(estado.carta.tipo);
-  const chave = [tipo, estado.carta.tipo, !!estado.carta.ficha].join(":");
+  const c = estado.carta;
+  const chave = [tipo, c.tipo, !!c.verso].join(":");
   if (chave === estado.chaveForm) return;
   estado.chaveForm = chave;
   atualizadores = [];
@@ -668,6 +673,7 @@ async function salvar() {
     estado.arquivo = r.arquivo;
     estado.sujo = false;
     atualizarEstado();
+    $("#estado").textContent += r.mesa ? " · enviada à mesa" : " · mesa fechada (a carta entra quando ela abrir)";
     await carregarLista();
     return true;
   } catch (err) { mensagem("erro", "Falha ao salvar: " + err.message); return false; }

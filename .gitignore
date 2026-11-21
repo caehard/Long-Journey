@@ -1,6 +1,12 @@
 # gerado (refaça com: python gerar.py --folha)
 out/
 
+# acervo da mesa e partida em andamento (refeitos por: python mesa.py)
+acervo/
+
+# ambiente Python do projeto (refaça com: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt)
+.venv/
+
 # cache do Python
 __pycache__/
 *.pyc

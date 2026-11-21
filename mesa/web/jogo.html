@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Partida Long Journey</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/web/mesa.css">
+<style>
+  body { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+  #raiz { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
+  /* entrada e sala */
+  .centro { max-width: 980px; width: 100%; margin: 0 auto; padding: 30px 16px; overflow-y: auto; }
+  .cartao { background: var(--painel); border: 1px solid var(--linha); border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; }
+  .cartao h2 { font-size: 16px; margin-bottom: 10px; }
+  .form-linha { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .sentados { list-style: none; margin: 0; padding: 0; }
+  .sentados li { display: flex; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--linha); }
+  .sentados li:last-child { border-bottom: none; }
+  .ponto { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex: none; }
+  .selo-al { font-size: 12px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--linha); }
+  .selo-al.bom { color: #9fd7ff; border-color: #3a6d91; }
+  .selo-al.mau { color: #ff9f9f; border-color: #8a3b3b; }
+  .selo-al.neutro { color: #d8d8a8; border-color: #6b6b4a; }
+
+  /* barra do turno */
+  .barra-turno { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 6px 16px; background: var(--fundo-2); border-bottom: 1px solid var(--linha); font-size: 14px; }
+  .fases { display: inline-flex; border: 1px solid var(--linha); border-radius: 8px; overflow: hidden; }
+  .fases span { padding: 3px 10px; color: var(--cinza); font-size: 13px; }
+  .fases span + span { border-left: 1px solid var(--linha); }
+  .fases span.ativa { background: var(--prata); color: #15181f; font-weight: 700; }
+  .transicao { background: var(--aviso) !important; color: #15181f !important; border-color: var(--aviso) !important; font-weight: 700; }
+  .fim { color: var(--aviso); font-weight: 700; }
+
+  /* área de jogo */
+  .jogo { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 300px; }
+  .tabuleiro { overflow-y: auto; padding: 12px 14px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .lateral { border-left: 1px solid var(--linha); display: flex; flex-direction: column; min-height: 0; }
+  .lateral section { padding: 10px 12px; border-bottom: 1px solid var(--linha); }
+  .lateral h3 { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--prata); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+  .lateral .log { flex: 1; min-height: 120px; display: flex; flex-direction: column; border-bottom: none; }
+  .linhas-log { flex: 1; overflow-y: auto; font-size: 13px; color: var(--cinza); }
+  .linhas-log div { padding: 2px 0; border-bottom: 1px dashed #262c3d; }
+  .linhas-log div.minha { color: var(--creme); }
+  .log input { width: 100%; margin-top: 6px; }
+
+  /* painel de cada jogador */
+  .painel { background: var(--painel); border: 1px solid var(--linha); border-left: 5px solid var(--cor); border-radius: 10px; padding: 8px 10px 10px; }
+  .painel.morto { opacity: .55; }
+  .painel.vez { box-shadow: 0 0 0 2px var(--cor); }
+  .cab { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .cab .nome-j { font: 700 16px "Cinzel", serif; color: var(--prata-clara); }
+  .contador { display: inline-flex; align-items: center; gap: 2px; font-size: 13px; background: var(--fundo-2); border: 1px solid var(--linha); border-radius: 6px; padding: 1px 4px; }
+  .contador b { min-width: 18px; text-align: center; }
+  .contador button { background: none; border: none; cursor: pointer; color: var(--cinza); padding: 0 4px; font-size: 14px; }
+  .contador button:hover { color: var(--creme); }
+  .contador select { padding: 0 2px; border: none; background: none; font-size: 13px; }
+  .linha-zonas { display: flex; gap: 10px; flex-wrap: wrap; align-items: stretch; }
+  .zona { background: var(--fundo-2); border: 1px dashed var(--linha); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 100px; }
+  .zona.larga { flex: 1 1 340px; }
+  .zona.alvo { border-color: var(--prata); background: #1a1f2d; }
+  .zona .rotulo-z { font-size: 11px; color: var(--cinza); text-transform: uppercase; letter-spacing: 1px; display: flex; gap: 6px; justify-content: space-between; }
+  .cartas { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; min-height: var(--carta-a); }
+
+  .carta { position: relative; width: var(--carta-l); height: var(--carta-a); flex: none; cursor: pointer; border-radius: 6px; }
+  .carta.exausta { width: var(--carta-a); }
+  .carta.exausta .face { transform: rotate(90deg); transform-origin: center; }
+  .carta .face { width: var(--carta-l); height: var(--carta-a); border-radius: 6px; transition: transform .15s; }
+  .carta.exausta .face { position: absolute; left: calc((var(--carta-a) - var(--carta-l)) / 2); top: 0; }
+  .carta.dono .face { box-shadow: 0 0 0 3px var(--cor-dono); }
+  .carta.neutro .face { box-shadow: 0 0 0 3px #d8434f; }
+  .carta:hover .face { outline: 2px solid var(--prata-clara); outline-offset: 1px; }
+  .carta.arrastando { opacity: .4; }
+  .carta.vazia .face { border: 1px dashed var(--linha); display: flex; align-items: center; justify-content: center; color: var(--cinza); font-size: 12px; }
+  .selo { position: absolute; z-index: 2; font-size: 11px; font-weight: 800; border-radius: 999px; padding: 0 6px; box-shadow: 0 1px 4px rgba(0,0,0,.6); pointer-events: none; }
+  .selo.marcador { left: -5px; top: -5px; background: var(--erro); color: #1a0d0d; min-width: 20px; text-align: center; font-size: 13px; }
+  .selo.cargas { left: 50%; bottom: -8px; transform: translateX(-50%); background: var(--prata); color: #15181f; white-space: nowrap; }
+  .selo.rotulo { left: 50%; top: -8px; transform: translateX(-50%); background: #d8434f; color: #fff; }
+  .selo.qtd { right: -6px; top: -6px; background: var(--prata); color: #15181f; font-size: 13px; }
+  .unidade { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .anexos { display: flex; gap: 3px; flex-wrap: wrap; max-width: 140px; justify-content: center; }
+  .anexos .carta { --carta-l: 40px; --carta-a: 56px; }
+  .pilha-cartas .carta + .carta { margin-left: 0; }
+  .espiadas { display: flex; gap: 4px; }
+  .espiadas .carta { --carta-l: 56px; --carta-a: 78px; }
+
+  /* mão */
+  .mao { border-top: 1px solid var(--linha); background: var(--painel); padding: 8px 14px 10px; display: flex; gap: 14px; align-items: flex-start; }
+  .mao .cartas { --carta-l: 100px; --carta-a: 140px; flex: 1; min-height: 140px; }
+  .mao .acoes { display: flex; flex-direction: column; gap: 6px; }
+  .mao h3 { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--prata); margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<header class="topo">
+  <h1>Partida</h1>
+  <nav><a href="/">Início</a><a href="/decks">Decks</a><a href="/jogo" class="ativo">Partida</a></nav>
+  <span class="espaco"></span>
+  <span class="dica" id="quem"></span>
+</header>
+<div id="raiz"></div>
+<script src="/web/comum.js"></script>
+<script src="/web/jogo.js"></script>
+</body>
+</html>
